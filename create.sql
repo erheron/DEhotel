@@ -17,19 +17,19 @@ create table goscie(
 );
 
 create table rezerwacje_goscie(
-	id_rez_zb serial not null primary key,
+	id_rez_zbiorczej serial not null primary key,
 	id_goscia integer not null references goscie
 );
 
 create table rezerwacje_pokoje(
-	id_rez_zb integer references rezerwacje_goscie,
-	id_rez_poj serial not null primary key,
+	id_rez_zbiorczej integer references rezerwacje_goscie,
+	id_rez_pojedynczej serial not null primary key,
 	id_pokoju integer not null references pokoje,
 	data_od date not null default current_date check (data_od>=current_date),
 	data_do date not null default current_date + interval '1 day' check (data_od<data_do),
 	cena numeric not null,
 	typ_platnosci char(1) check (typ_platnosci='G' or typ_platnosci='P') not null, -- G-gotwka, P-przelew
-	plan_licz_os numeric,
+	plan_liczba_osob numeric,
 	anulowane_data date default null
 );
 
@@ -47,27 +47,27 @@ create table pokoje_wyposazenie(
 
 create table platnosci(
 	id_platnosci serial not null primary key,
-	id_rez_zb integer references rezerwacje_goscie,
-	data_plat date not null default current_date check (data_plat<=current_date),
+	id_rez_zbiorczej integer references rezerwacje_goscie,
+	data_platnosci date not null default current_date check (data_platnosci<=current_date),
 	kwota numeric not null
 );
 
 create table kary(
 	id_kary serial not null primary key,
-	id_rez_zb integer references rezerwacje_goscie,
+	id_rez_zbiorczej integer references rezerwacje_goscie,
 	data_kary  date not null default current_date check (data_kary<=current_date),
 	kwota numeric not null
 );
 
 create table uslugi_dod(
-	id_usl serial not null primary key,
+	id_uslugi_dod serial not null primary key,
 	nazwa varchar(20) not null,
 	cena numeric not null
 );
 
 create table usl_rez(
-	id_uslugi integer not null references uslugi_dod,
-	id_rez_zb integer references rezerwacje_goscie
+	id_uslugi_dod integer not null references uslugi_dod,
+	id_rez_zbiorczej integer references rezerwacje_goscie
 );
 COMMIT;
 
