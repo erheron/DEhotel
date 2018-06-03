@@ -1,4 +1,4 @@
-BEGIN
+BEGIN;
 create table pokoje(
 	id_pokoju serial not null primary key,
 	cena_podstawowa numeric not null,
