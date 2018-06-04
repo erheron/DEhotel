@@ -12,8 +12,7 @@ create table goscie(
 	nr_tel char(9) not null,
 	constraint tel_uniq unique(nr_tel),
 	email varchar check (email like '%@%'),
-	constraint mail_uniq unique(email),
-	pierwsza_wizyta date not null default current_date check (pierwsza_wizyta<=current_date)
+	constraint mail_uniq unique(email)
 );
 
 create table rezerwacje_goscie(
@@ -67,7 +66,8 @@ create table uslugi_dod(
 
 create table usl_rez(
 	id_uslugi integer not null references uslugi_dod,
-	id_rez_zb integer references rezerwacje_goscie
+	id_rez_zb integer references rezerwacje_goscie,
+	liczba numeric not null default 0
 );
 COMMIT;
 
