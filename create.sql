@@ -32,11 +32,15 @@ create table rezerwacje_pokoje(
 	anulowane_data date default null
 );
 
+create table rodzaje_wyposazenia(
+	nazwa varchar not null primary key,
+	cena_przedmiotu numeric not null,
+	liczba_przedmiotow numeric not null
+);
+
 create table wyposazenie(
 	id serial not null primary key,
-	nazwa varchar not null,
-	cena numeric not null,
-	data_zakupu date not null default current_date check (data_zakupu<=current_date)
+	nazwa varchar not null references rodzaje_wyposazenia
 );
 
 create table pokoje_wyposazenie(
@@ -66,8 +70,11 @@ create table uslugi_dod(
 
 create table usl_rez(
 	id_uslugi_dod integer not null references uslugi_dod,
-	id_rez_zbiorczej integer references rezerwacje_goscie,
-	liczba numeric not null default 1
+	id_rez_pojedynczej integer references rezerwacje_pokoje,
+	liczba numeric not null default 1,
+	data_od date not null,
+	data_do date not null,
+	data_anulowania date default null
 );
 COMMIT;
 

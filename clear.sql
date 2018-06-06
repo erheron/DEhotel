@@ -4,6 +4,7 @@ drop table if exists kary;
 drop table if exists platnosci;
 drop table if exists pokoje_wyposazenie;
 drop table if exists wyposazenie;
+drop table if exists rodzaje_wyposazenia;
 drop table if exists rezerwacje_pokoje;
 drop table if exists rezerwacje_goscie;
 drop table if exists goscie;
