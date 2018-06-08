@@ -1,6 +1,7 @@
 BEGIN;
 create table pokoje(
 	id_pokoju serial not null primary key,
+	typ varchar(20) not null,
 	cena_podstawowa numeric not null,
 	max_liczba_osob numeric(2) not null
 );
@@ -10,9 +11,11 @@ create table goscie(
 	imie varchar not null,
 	nazwisko varchar not null,
 	nr_tel char(9) not null,
-	constraint tel_uniq unique(nr_tel),
-	email varchar check (email like '%@%'),
-	constraint mail_uniq unique(email)
+	--constraint tel_uniq unique(nr_tel),
+	email varchar check (email is null or email like '%@%')
+	--constraint mail_uniq unique(email),
+	--email varchar check (email like '%@%'),
+	--constraint mail_uniq unique(email)
 );
 
 create table rezerwacje_goscie(
@@ -33,14 +36,16 @@ create table rezerwacje_pokoje(
 );
 
 create table rodzaje_wyposazenia(
-	nazwa varchar not null primary key,
+  id_rodzaju_wyposazenia serial primary key,
+	nazwa varchar not null,
 	cena_przedmiotu numeric not null,
 	liczba_przedmiotow numeric not null
 );
 
 create table wyposazenie(
 	id serial not null primary key,
-	nazwa varchar not null references rodzaje_wyposazenia
+  id_rodzaju integer references rodzaje_wyposazenia
+	--nazwa varchar not null references rodzaje_wyposazenia
 );
 
 create table pokoje_wyposazenie(
