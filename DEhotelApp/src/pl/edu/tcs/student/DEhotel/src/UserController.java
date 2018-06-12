@@ -24,10 +24,15 @@ public class UserController {
     @FXML public DatePicker calendar;
     @FXML public Label calendarLabel;
     @FXML public TextField peopleTextField;
+    @FXML public Button mainReserveB;
+    @FXML public Button oneMoreResB;
+
+
     /*----------------------1-------------------
      *              general fields used        */
 
     private final String pattern = "yyyy-MM-dd";
+
 
 
     LocalDate checkinDate, checkoutDate;
@@ -86,11 +91,24 @@ public class UserController {
     }
 
     /*----------------------10---------------------
-     *         bunch of checker methods            */
+     *         bunch of checker  methods            */
     private boolean checkDates(){
         return checkinDate.isBefore(checkoutDate);
     }
+
     /*----------------end of block------------------
      *                      10                      */
+
+
+    /*----------------------11---------------------
+     *           bunch of handler  methods            */
+    public void mainReserveBaction(ActionEvent actionEvent) {
+    }
+
+    public void oneMoreResBaction(ActionEvent actionEvent) {
+    }
+    /*----------------end of block------------------
+     *                      11                    */
+
 
 }
