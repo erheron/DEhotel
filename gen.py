@@ -218,9 +218,7 @@ mainMaker = maker()
 
 #filling guests, say there were about 400 guests in our hotel
 mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_pl, False) 
-mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel',100, f_pl, True) 
 mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_us, False) 
-mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel',100, f_us, True)
 
 #filling rooms, they're static as I've decided
 mainMaker.insert_rooms_static()
