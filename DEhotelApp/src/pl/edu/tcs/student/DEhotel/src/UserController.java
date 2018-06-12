@@ -11,7 +11,7 @@ import javafx.util.StringConverter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class Controller{
+public class UserController {
 
     @FXML public AnchorPane root;
     @FXML public Button reserveButton;
@@ -23,11 +23,12 @@ public class Controller{
     @FXML public Button checkinButton;
     @FXML public DatePicker calendar;
     @FXML public Label calendarLabel;
-
+    @FXML public TextField peopleTextField;
     /*----------------------1-------------------
      *              general fields used        */
 
     private final String pattern = "yyyy-MM-dd";
+
 
     LocalDate checkinDate, checkoutDate;
 
@@ -66,16 +67,19 @@ public class Controller{
         checkinTF.setText(calendar.getConverter().toString(calendar.getValue()));
         calendarLabel.setText("Select check-out date");
 
+
     }
 
     public void checkoutButtonOnAction(ActionEvent actionEvent) {
         checkoutDate = calendar.getValue();
         if(checkDates()) {
             checkoutTF.setText(calendar.getConverter().toString(calendar.getValue()));
+            peopleTextField.setEditable(true);
         }
     }
 
     public void reserveButtonOnAction(ActionEvent actionEvent) {
+
     }
 
     public void seeMyVisitsButtonOnAction(ActionEvent actionEvent) {
@@ -86,5 +90,7 @@ public class Controller{
     private boolean checkDates(){
         return checkinDate.isBefore(checkoutDate);
     }
+    /*----------------end of block------------------
+     *                      10                      */
 
 }
