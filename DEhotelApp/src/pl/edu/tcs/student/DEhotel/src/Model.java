@@ -22,7 +22,6 @@ public class Model extends Application {
     public static void main(String[] args){
         launch(args);
     }
-
     /* Logics for interacting with PostgreSQL*/
     //TODO
 }
