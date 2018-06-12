@@ -1,7 +1,9 @@
 #!/bin/bash
 #TODO
 name=$USER
+echo "Attempting to create database \"hotel\" as root, required sudo privilegies. You can crete it yourself"
 #sudo su -l postgres -c "createdb hotel --owner='$name' --no-password" 2&> /dev/null
+
 
 #checking all project requirements before start
 echo "Checking if python3 is installed..."
