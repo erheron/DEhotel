@@ -1,3 +1,4 @@
+drop table if exists email_hash cascade;
 drop table if exists usl_rez;
 drop table if exists uslugi_dod;
 drop table if exists kary;

@@ -1,7 +1,7 @@
 #!/bin/bash
 #TODO
 name=$USER
-sudo su -l postgres -c "createdb hotel --owner='$name' --no-password" 2&> /dev/null
+#sudo su -l postgres -c "createdb hotel --owner='$name' --no-password" 2&> /dev/null
 
 #checking all project requirements before start
 echo "Checking if python3 is installed..."
@@ -15,7 +15,7 @@ echo "We will also need python3-pip package"
 echo "Installed properly"
 
 echo "Installing third-party package 'Faker' from github:..."
-python3 -m pip install Faker
+#python3 -m pip install Faker
 echo "Installed properly"
 
 #main part

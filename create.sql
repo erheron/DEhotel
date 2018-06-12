@@ -5,17 +5,17 @@ create table pokoje(
 	cena_podstawowa numeric not null,
 	max_liczba_osob numeric(2) not null
 );
-
+/*create table email_hash(
+email varchar(100) primary key,
+	hash numeric(10),
+);*/
 create table goscie(
 	id_goscia serial not null primary key,
 	imie varchar not null,
 	nazwisko varchar not null,
 	nr_tel char(9) not null,
-	--constraint tel_uniq unique(nr_tel),
-	email varchar check (email is null or email like '%@%')
-	--constraint mail_uniq unique(email),
-	--email varchar check (email like '%@%'),
-	--constraint mail_uniq unique(email)
+	email varchar(100),
+	check (email like '%@%')
 );
 
 create table rezerwacje_goscie(
