@@ -23,6 +23,7 @@ public class LoginController {
     SimpleBooleanProperty loginBPressed = new SimpleBooleanProperty(false);
     String userName = null;
 
+
     /*-------------end of block-----------
      *                  1               */
 

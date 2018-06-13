@@ -32,8 +32,32 @@ public class UserController {
      *              general fields used        */
 
     private final String pattern = "yyyy-MM-dd";
+    
+    //list for reservations
 
+    public <T, U> class Pair<T, U> {
+        T t;
+        U u;
+        Pair(T t, U u){
+            this.t = t;
+            this.u = u;
+        }
 
+    }
+    private class reservation{
+        String checkinDate, checkoutDate;    
+        int amountOfPeople;
+        String roomType;
+    }
+    private class services{
+        String services;
+        public services(){
+            services = null;
+        }
+    }
+
+    }
+    List<Pair<reservation, List<services> > > reservations;
 
     LocalDate checkinDate, checkoutDate;
 
@@ -88,6 +112,7 @@ public class UserController {
     }
 
     public void seeMyVisitsButtonOnAction(ActionEvent actionEvent) {
+        //some postgresql stuff
     }
 
     /*----------------------10---------------------
@@ -103,9 +128,13 @@ public class UserController {
     /*----------------------11---------------------
      *           bunch of handler  methods            */
     public void mainReserveBaction(ActionEvent actionEvent) {
+        //insert into table all stuff from 'reservations'
+        //perform checking if non-empty
     }
 
     public void oneMoreResBaction(ActionEvent actionEvent) {
+        //change state to initial
+
     }
     /*----------------end of block------------------
      *                      11                    */
