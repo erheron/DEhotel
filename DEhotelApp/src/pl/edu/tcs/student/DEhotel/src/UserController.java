@@ -115,8 +115,12 @@ public class UserController {
         calendar.setConverter(converter);
     }
     public void checkinButtonOnAction(ActionEvent actionEvent) {
+        LocalDate date = checkinDate;
         checkinDate = calendar.getValue();
-        if(checkinDate == null || checkinDate.isBefore(LocalDate.now())) return;
+        if(checkinDate == null || checkinDate.isBefore(LocalDate.now()) || (checkoutDate != null && checkinDate.isAfter(checkoutDate))) {
+            checkinDate = date;
+            return;
+        }
         checkinTF.setText(calendar.getConverter().toString(calendar.getValue()));
         calendarLabel.setText("Select check-out date");
 
@@ -124,10 +128,13 @@ public class UserController {
     }
 
     public void checkoutButtonOnAction(ActionEvent actionEvent) {
+        LocalDate date = checkoutDate;
         checkoutDate = calendar.getValue();
         if(checkDates()) {
             checkoutTF.setText(calendar.getConverter().toString(calendar.getValue()));
             peopleTextField.setEditable(true);
+        }else{
+            checkoutDate = date;
         }
     }
 
@@ -205,14 +212,21 @@ public class UserController {
         enableRegistration();
         //
     }
+    private boolean checkData(){
+        if(checkinDate == null || checkoutDate == null) return false;
+        return true;
+    }
 
-    private boolean addCurrentState(){
-        try{
+    //returns true if data was proper and false otherwise
+    private boolean addCurrentState() {
+        //TODO= cast menu option to string
+        try {
             curReservation = new Reservation(checkinDate.toString(), checkoutDate.toString(), Integer.parseInt(peopleTextField.getText()), "coś do zrobienia");
-        }catch(Exception e){
+        } catch (Exception e) {
             return false;
         }
         return true;
+    }
 
     /*----------------end of block------------------
      *                      12                    */
