@@ -13,13 +13,11 @@ public class Model extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         //some global settings go
-        primaryStage.setWidth(600);
+        primaryStage.setWidth(700);
         primaryStage.setHeight(800);
         primaryStage.setTitle("DEhotel - from Krakow with love :)");
         //login form goes first
         Stage loginStage = new Stage();
-//        loginStage.setWidth(400);
-//        loginStage.setHeight(500);
         FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("login.fxml"));
         AnchorPane loginRoot = loginLoader.load();
         loginController = loginLoader.getController();

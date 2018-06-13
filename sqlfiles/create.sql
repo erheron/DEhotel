@@ -6,17 +6,15 @@ create table pokoje(
 	max_liczba_osob numeric(2) not null
 );
 create table email_hash(
-	email varchar(100),
-	hash numeric(10),
-	constraint email_hash_email_pkey PRIMARY KEY (email) DEFERRABLE INITIALLY DEFERRED
-	
+	email varchar(100) PRIMARY KEY,
+	hash numeric(10)
 );
 create table goscie(
 	id_goscia serial not null primary key,
 	imie varchar not null,
 	nazwisko varchar not null,
 	nr_tel char(9) not null,
-	email varchar(100),
+	email varchar(100) references email_hash,
 	check (email like '%@%')
 );
 
