@@ -13,17 +13,19 @@ hash pip3 2> /dev/null || { echo "No pip3 detected, aborting..."; exit 1; }
 
 #checking 'psycopg2'
 echo "Checking ig 'psycopg2' is installed"
-try=$(pip3 show faker)
-if [ try != "" ]; then echo "Already installed" 
+echo "" > log
+pip3 show psycopg2 > log
+if [ -s log ]; then echo "Already installed" 
 else 
 	pip3 install psycopg2
 	echo "Installed properly"
 fi
 
+echo "" > log
 #checking 'faker'
 echo "Installing third-party package 'Faker' "
-try=$(pip3 show faker)
-if [ try != "" ]; then echo "Already installed" 
+pip3 show Faker > log
+if [ -s log ]; then echo "Already installed" 
 else 
 	pip3 install Faker
 	echo "Installed properly"
