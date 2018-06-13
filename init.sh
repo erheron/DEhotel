@@ -1,26 +1,35 @@
 #!/bin/bash
-#TODO
-name=$USER
-echo "Attempting to create database \"hotel\" as root, required sudo privilegies. You can crete it yourself"
+user=$USER
+#echo "Attempting to create database \"hotel\" as root, required sudo privilegies. You can crete it yourself"
 #sudo su -l postgres -c "createdb hotel --owner='$name' --no-password" 2&> /dev/null
 
 
 #checking all project requirements before start
 echo "Checking if python3 is installed..."
-python3installed=false
-#TODO
-echo "Seems like you have no Python3 installed, proceed and try to install?"
+hash python3 2> /dev/null || { echo "Seems like you have no Python3 installed, aborting..."; exit 1; }
 
-python3pipinstalled=false
-echo "We will also need python3-pip package"
-#TODO
-echo "Installed properly"
+echo "We will also need pip3 package. Checking..."
+hash pip3 2> /dev/null || { echo "No pip3 detected, aborting..."; exit 1; } 
 
-echo "Installing third-party package 'Faker' from github:..."
-#python3 -m pip install Faker
-echo "Installed properly"
+#checking 'psycopg2'
+echo "Checking ig 'psycopg2' is installed"
+try=$(pip3 show faker)
+if [ try != "" ]; then echo "Already installed" 
+else 
+	pip3 install psycopg2
+	echo "Installed properly"
+fi
+
+#checking 'faker'
+echo "Installing third-party package 'Faker' "
+try=$(pip3 show faker)
+if [ try != "" ]; then echo "Already installed" 
+else 
+	pip3 install Faker
+	echo "Installed properly"
+fi
 
 #main part
-psql -d hotel < clear.sql
-psql -d hotel < create.sql
-python3 gen.py
+psql -d hotel < sqlfiles/clear.sql
+psql -d hotel < sqlfiles/create.sql
+python3 generator/gen.py
