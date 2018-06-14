@@ -45,11 +45,12 @@ public class LoginController {
     private Long hash(String s){
         int mod = 1000000009;
         Long res = 0L;
-        Long P = 0L;
+        Long P = 1L;
         for(char c : s.toCharArray()){
             res += c * P;
             P *= 31;
             res %= mod;
+            P %= mod;
         }
         return res;
     }
@@ -110,4 +111,10 @@ public class LoginController {
     }
     /*-------------end of block-----------
      *                  3               */
+
+    public boolean checkString(String q){
+        if(q.contains("SELECT"))
+            return false;
+        return true;
+    }
 }

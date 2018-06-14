@@ -8,6 +8,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
 
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -33,7 +34,7 @@ public class UserController {
      *              general fields used        */
 
     private final String pattern = "yyyy-MM-dd";
-
+    Connection connection;
 
     //list for reservations
 
@@ -205,8 +206,28 @@ public class UserController {
 
 
     public void peopleInRoomAction(KeyEvent keyEvent) {
-        if(keyEvent.getCode().equals(KeyCode.ENTER) || keyEvent.getCode().equals(KeyCode.TAB))
+        if (keyEvent.getCode().equals(KeyCode.ENTER) || keyEvent.getCode().equals(KeyCode.TAB)) {
             selRoomTypeMB.requestFocus();
+            try {
+                Statement stmt = connection.createStatement();
+                selRoomTypeMB.getItems().removeIf(e -> !e.getText().equals("Doesn't matter"));
+                String select = "select distinct typ from pokoje where max_liczba_osob >= "+ Integer.parseInt(peopleTextField.getText()) +";";
+                String roomType;//next
+                ResultSet rs = stmt.executeQuery(select);
+                while(rs.next()){//TODO
+                    roomType = rs.getString("typ") ;
+                    MenuItem nextMI = new MenuItem();
+                    nextMI.setText(roomType);
+                    nextMI.setOnAction(e -> {
+                        selRoomTypeMB.setText(nextMI.getText());
+                    });
+                    selRoomTypeMB.getItems().add(nextMI);
+                }
+                rs.close();
+            }catch(Exception e){
+                System.err.println(e.getMessage());
+            }
+        }
     }
     public void selRoomTypeMBaction(ActionEvent actionEvent) {
         enableRegistration();

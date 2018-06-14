@@ -42,6 +42,7 @@ public class Model extends Application {
             AnchorPane userFormRoot = userLoader.load();
             userController = userLoader.getController();
             userController.usernameLabel.setText(loginController.userName);
+            userController.connection = this.connection;
             Scene userScene = new Scene(userFormRoot);
             primaryStage.setScene(userScene);
             primaryStage.show();
