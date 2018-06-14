@@ -43,6 +43,7 @@ public class Model extends Application {
             userController = userLoader.getController();
             userController.usernameLabel.setText(loginController.userName);
             userController.connection = this.connection;
+            userController.idGast = loginController.idGast;
             Scene userScene = new Scene(userFormRoot);
             primaryStage.setScene(userScene);
             primaryStage.show();

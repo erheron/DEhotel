@@ -24,6 +24,7 @@ public class LoginController {
     SimpleBooleanProperty loginBPressed = new SimpleBooleanProperty(false);
     String userName = null;
     private Connection conn;
+    int idGast;
 
 
     /*-------------end of block-----------
@@ -74,13 +75,14 @@ public class LoginController {
 
             //execute query
             stmt = conn.createStatement();
-            String select = "select imie, nazwisko from email_hash natural join goscie where email = '" +login+ "' and hash = " + hash + ";";
+            String select = "select imie, nazwisko, id_goscia from email_hash natural join goscie where email = '" +login+ "' and hash = " + /*hash */ 1+ ";";
             ResultSet rs = stmt.executeQuery(select);
             if (!rs.isBeforeFirst() ) { //user or password don't exist
                 return 2;
             }
             rs.next();
             userName = rs.getString("imie") + " " +rs.getString("nazwisko");
+            idGast = rs.getInt("id_goscia");
             rs.close();
             //userName = "Katarzyna Grygiel";//TODO - data from postgresql
             return 1;

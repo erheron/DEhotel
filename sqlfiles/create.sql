@@ -69,7 +69,7 @@ create table kary(
 
 create table uslugi_dod(
 	id_uslugi_dod serial not null primary key,
-	nazwa varchar(20) not null,
+	nazwa varchar(30) not null,
 	cena numeric not null
 );
 
