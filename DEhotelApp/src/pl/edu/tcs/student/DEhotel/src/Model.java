@@ -3,16 +3,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import java.sql.*;
 
+import java.sql.DriverManager;
 import java.util.Objects;
 
-public class Model extends Application {
+public class Model extends Application{
     private UserController userController;
     private AdminController adminController;
     private LoginController loginController;
     private Integer showUserForm = null;
+    private Connection connection;
     @Override
     public void start(Stage primaryStage) throws Exception{
+        connection();
         //some global settings go
         primaryStage.setWidth(600);
         primaryStage.setHeight(800);
@@ -24,6 +28,7 @@ public class Model extends Application {
         FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("login.fxml"));
         AnchorPane loginRoot = loginLoader.load();
         loginController = loginLoader.getController();
+        loginController.addConnection(connection);
         loginController.loginBPressed.addListener(e -> {
             showUserForm = loginController.tryLogin();
             loginStage.close();
@@ -57,5 +62,23 @@ public class Model extends Application {
         launch(args);
     }
     /* Logics for interacting with PostgreSQL*/
-    //TODO
+    //TODO*/
+    private void connection() {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Where is your PostgreSQL JDBC Driver?");
+            e.printStackTrace();
+            return;
+        }
+        try {
+
+            connection = DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/hotel", "erheron",
+                    "erheron");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
