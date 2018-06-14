@@ -3,28 +3,25 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import java.util.Objects;
 import java.sql.*;
 
-import java.sql.DriverManager;
-import java.util.Objects;
-
-public class Model extends Application{
+public class Model extends Application {
     private UserController userController;
     private AdminController adminController;
     private LoginController loginController;
     private Integer showUserForm = null;
     private Connection connection;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         connection();
         //some global settings go
-        primaryStage.setWidth(600);
+        primaryStage.setWidth(700);
         primaryStage.setHeight(800);
         primaryStage.setTitle("DEhotel - from Krakow with love :)");
         //login form goes first
         Stage loginStage = new Stage();
-//        loginStage.setWidth(400);
-//        loginStage.setHeight(500);
         FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("login.fxml"));
         AnchorPane loginRoot = loginLoader.load();
         loginController = loginLoader.getController();
@@ -62,15 +59,16 @@ public class Model extends Application{
         launch(args);
     }
     /* Logics for interacting with PostgreSQL*/
-    //TODO*/
+    //TODO
     private void connection() {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("Where is your PostgreSQL JDBC Driver?");
+            System.out.println("I can't find your PostgreSQL JDBC Driver!");
             e.printStackTrace();
             return;
         }
+
         try {
 
             connection = DriverManager.getConnection(
@@ -78,7 +76,9 @@ public class Model extends Application{
                     "erheron");
 
         } catch (SQLException e) {
+            System.out.println("Connection Failed!");
             e.printStackTrace();
+
         }
     }
 }

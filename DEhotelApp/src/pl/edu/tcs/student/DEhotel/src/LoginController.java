@@ -8,8 +8,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-
 import java.sql.*;
+
 import java.util.Objects;
 
 public class LoginController {
@@ -33,12 +33,13 @@ public class LoginController {
     /*------------------2-----------------
      *       initializer and "hash"
      *       to work from Model            */
-    public void addConnection(Connection conn){
-        this.conn = conn;
-    }
     public void initialize(){
         root.requestFocus();
 
+    }
+
+    public void addConnection(Connection conn){
+        this.conn = conn;
     }
 
     private Long hash(String s){
@@ -110,6 +111,3 @@ public class LoginController {
     /*-------------end of block-----------
      *                  3               */
 }
-
-
-
