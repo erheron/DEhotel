@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import java.sql.*;
 
 import java.util.Objects;
 
@@ -22,6 +23,7 @@ public class LoginController {
     @FXML public AnchorPane root;
     SimpleBooleanProperty loginBPressed = new SimpleBooleanProperty(false);
     String userName = null;
+    private Connection conn;
 
 
     /*-------------end of block-----------
@@ -34,6 +36,10 @@ public class LoginController {
     public void initialize(){
         root.requestFocus();
 
+    }
+
+    public void addConnection(Connection conn){
+        this.conn = conn;
     }
 
     private Long hash(String s){
@@ -53,19 +59,32 @@ public class LoginController {
         //returns 0 if login was performed as ADMIN
         //otherwise 1 if user's match
         //otherwise 2 - error code
+        Statement stmt = null;
         try{
             String login = loginF.getText();
             String password = passwordF.getText();
             Long hash = hash(password);
-            //TODO - postgresql interaction
-            //TODO=if(hashes match then...)
+
+            //admin
             if(Objects.equals(login, "admin") && Objects.equals(password, "admin")) {
                 userName = "admin";
                 return 0;
             }
-            userName = "Katarzyna Grygiel";//TODO - data from postgresql
+
+            //execute query
+            stmt = conn.createStatement();
+            String select = "select imie, nazwisko from email_hash natural join goscie where email = '" +login+ "' and hash = " + hash + ";";
+            ResultSet rs = stmt.executeQuery(select);
+            if (!rs.isBeforeFirst() ) { //user or password don't exist
+                return 2;
+            }
+            rs.next();
+            userName = rs.getString("imie") + " " +rs.getString("nazwisko");
+            rs.close();
+            //userName = "Katarzyna Grygiel";//TODO - data from postgresql
             return 1;
         }catch(Exception e){
+            System.err.println(e.getMessage());
             //TODO = alert
         }
         return 2;
