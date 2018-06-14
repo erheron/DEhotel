@@ -36,4 +36,6 @@ fi
 #main part
 psql -d hotel < sqlfiles/clear.sql
 psql -d hotel < sqlfiles/create.sql
+psql -d hotel < sqlfiles/functions.sql
+psql -d hotel < sqlfiles/insertServices.sql
 python3 generator/gen.py

@@ -1,14 +1,12 @@
 --oblicza znizke na podstawie liczby dni spedzonych w hotelu
 --[1,30) dni - 5% znizki
 --[30,...) dni 15% znizki
-create or replace function oblicz_znizke(e_mail varchar, cena numeric)
+create or replace function oblicz_znizke(id integer, cena numeric)
 	returns numeric as
 $$
 declare
 	suma_dni numeric;
-	id integer;
 begin
-	id = (select id_goscia from goscie g where g.email=e_mail);
 	suma_dni = coalesce((select sum(data_do - data_od)
 			from  rezerwacje_pokoje natural join rezerwacje_goscie
 			where id = id_goscia),0);
