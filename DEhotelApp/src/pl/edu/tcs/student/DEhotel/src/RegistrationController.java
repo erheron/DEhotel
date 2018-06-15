@@ -1,5 +1,6 @@
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -44,8 +45,11 @@ public class RegistrationController {
 
         }catch (Exception e){
             System.err.println(e.getMessage());
-            Text text = new Text("Incorrect data");
-            //TODO = print message
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error Dialog");
+            alert.setHeaderText("Incorrect data!");
+            alert.setContentText("Please, enter your personal information.");
+            alert.showAndWait();
         }
     }
 

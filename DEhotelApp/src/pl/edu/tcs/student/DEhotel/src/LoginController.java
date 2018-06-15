@@ -3,6 +3,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -68,7 +69,7 @@ public class LoginController {
             String select = "select imie, nazwisko, id_goscia from email_hash natural join goscie where email = '" +login+ "' and hash = " + hash+ ";";
             ResultSet rs = stmt.executeQuery(select);
             if (!rs.isBeforeFirst() ) { //user or password don't exist
-                return 2;
+                throw new Exception();
             }
             rs.next();
             userName = rs.getString("imie") + " " +rs.getString("nazwisko");
@@ -78,7 +79,12 @@ public class LoginController {
             return 1;
         }catch(Exception e){
             System.err.println(e.getMessage());
-            //TODO = alert
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Login error!");
+                alert.setContentText("User or password don't exist.");
+                alert.showAndWait();
+
         }
         return 2;
     }
