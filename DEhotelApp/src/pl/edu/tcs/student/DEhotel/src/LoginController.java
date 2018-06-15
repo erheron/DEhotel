@@ -31,7 +31,6 @@ public class LoginController {
     private RegistrationController registrationController;
     SimpleBooleanProperty loginBPressed = new SimpleBooleanProperty(false);
     String userName = null;
-    private Connection conn;
     int idGast;
 
 
@@ -45,10 +44,6 @@ public class LoginController {
     public void initialize(){
         root.requestFocus();
 
-    }
-
-    public void addConnection(Connection conn){
-        this.conn = conn;
     }
 
 
@@ -69,8 +64,8 @@ public class LoginController {
             }
 
             //execute query
-            stmt = conn.createStatement();
-            String select = "select imie, nazwisko, id_goscia from email_hash natural join goscie where email = '" +login+ "' and hash = " + /*hash */ 1+ ";";
+            stmt = Model.connection.createStatement();
+            String select = "select imie, nazwisko, id_goscia from email_hash natural join goscie where email = '" +login+ "' and hash = " + hash+ ";";
             ResultSet rs = stmt.executeQuery(select);
             if (!rs.isBeforeFirst() ) { //user or password don't exist
                 return 2;

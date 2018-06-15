@@ -40,7 +40,7 @@ public class UserController {
      *              general fields used        */
 
     private final String pattern = "yyyy-MM-dd";
-    Connection connection;
+    //Connection connection;
     private StringBuilder roomType;
     private int idRoom;
     int idGast;
@@ -167,7 +167,7 @@ public class UserController {
     public void seeMyVisitsButtonOnAction(ActionEvent actionEvent) {
         try {
             String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + ";";
-            Statement statement = connection.createStatement();
+            Statement statement = Model.connection.createStatement();
             ResultSet rs = statement.executeQuery(selectVisits);
             while(rs.next()){
                 //TODO = przegladnie rezerwacji
@@ -193,7 +193,7 @@ public class UserController {
     public void mainReserveBaction(ActionEvent actionEvent) {
         addCurrentState();
         try {
-            Statement statement = connection.createStatement();
+            Statement statement = Model.connection.createStatement();
             String mainReserve = "insert into rezerwacje_goscie values (default, "+ idGast + ");";
             statement.executeUpdate(mainReserve);
             String selectID = "select id_rez_zbiorczej from rezerwacje_goscie order by 1 desc limit 1;";
@@ -246,7 +246,7 @@ public class UserController {
     }
     public void extraServicesBaction(ActionEvent actionEvent) {
         try{
-            Statement statement = connection.createStatement();
+            Statement statement = Model.connection.createStatement();
             String selectServices = "select * from uslugi_dod";
             ResultSet rs = statement.executeQuery(selectServices);
            // ArrayList<Integer> id = new ArrayList<>(); //id_uslugi
@@ -297,7 +297,7 @@ public class UserController {
         if (keyEvent.getCode().equals(KeyCode.ENTER) || keyEvent.getCode().equals(KeyCode.TAB)) {
             selRoomTypeMB.requestFocus();
             try {
-                Statement stmt = connection.createStatement();
+                Statement stmt = Model.connection.createStatement();
                 selRoomTypeMB.getItems().removeIf(e -> !e.getText().equals("Doesn't matter"));
                 String select = "select distinct typ, id_pokoju " +
                                 "from pokoje" +
