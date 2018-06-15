@@ -351,7 +351,8 @@ public class UserController {
                                 " where max_liczba_osob >= " + Integer.parseInt(peopleTextField.getText()) +
                                 " and not exists (select id_rez_pojedynczej from rezerwacje_pokoje " +
                                     "where (data_od >= '"+ checkinTF.getText() +"'::date and data_od < '"+ checkoutTF.getText() + "'::date) or " +
-                                    "(data_do > '" + checkinTF.getText() +"'::date and data_do <= '"+ checkoutTF.getText()+ "'::date ));";
+                                    "(data_do > '" + checkinTF.getText() +"'::date and data_do <= '"+ checkoutTF.getText()+ "'::date )" +
+                                    " or (data_od <= '" + checkinTF.getText() +"'::date and data_do >= '"+ checkoutTF.getText()+ "'::date ));";
                 String roomType;//next
                 ResultSet rs = stmt.executeQuery(select);
                 while(rs.next()){
