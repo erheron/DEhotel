@@ -3,6 +3,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.Objects;
 import java.sql.*;
 
@@ -25,13 +29,14 @@ public class Model extends Application {
         FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("login.fxml"));
         AnchorPane loginRoot = loginLoader.load();
         loginController = loginLoader.getController();
-        loginController.loginBPressed.addListener(e -> {
+        loginController.loginB.setOnAction(e -> {
             showUserForm = loginController.tryLogin();
             if(showUserForm != 2 && showUserForm != null) {
+
                 loginStage.close();
             }
             else{
-                loginController = loginLoader.getController();
+                loginController.bringToInitialState();
             }
         });
         Scene loginScene = new Scene(loginRoot);
@@ -62,8 +67,7 @@ public class Model extends Application {
     public static void main(String[] args){
         launch(args);
     }
-    /* Logics for interacting with PostgreSQL*/
-    //TODO
+
     private void connection() {
         try {
             Class.forName("org.postgresql.Driver");
@@ -74,12 +78,14 @@ public class Model extends Application {
         }
 
         try {
+            File file = new File("dataConnection");
 
+            BufferedReader br = new BufferedReader(new FileReader(file));
             connection = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/postgres", "postgres",
-                    "kasia123");
+                    br.readLine(), br.readLine(),
+                    br.readLine());
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.out.println("Connection Failed!");
             e.printStackTrace();
 

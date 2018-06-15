@@ -30,7 +30,7 @@ public class LoginController {
     @FXML public AnchorPane root;
 
     private RegistrationController registrationController;
-    SimpleBooleanProperty loginBPressed = new SimpleBooleanProperty(false);
+    //SimpleBooleanProperty loginBPressed = new SimpleBooleanProperty(false);
     String userName = null;
     int idGast;
 
@@ -45,6 +45,13 @@ public class LoginController {
     public void initialize(){
         root.requestFocus();
 
+    }
+
+    public void bringToInitialState(){
+        passwordF.setText("");
+        loginF.setText("");
+        /*loginBPressed = new SimpleBooleanProperty(false);
+        loginBPressed.set(false);*/
     }
 
 
@@ -75,7 +82,6 @@ public class LoginController {
             userName = rs.getString("imie") + " " +rs.getString("nazwisko");
             idGast = rs.getInt("id_goscia");
             rs.close();
-            //userName = "Katarzyna Grygiel";//TODO - data from postgresql
             return 1;
         }catch(Exception e){
             System.err.println(e.getMessage());
@@ -102,10 +108,6 @@ public class LoginController {
     public void loginFkPressed(KeyEvent keyEvent) {
         if(keyEvent.getCode().equals(KeyCode.TAB) || keyEvent.getCode().equals(KeyCode.ENTER))
             passwordF.requestFocus();
-    }
-
-    public void loginBpressed(ActionEvent actionEvent) {
-        loginBPressed.set(true);
     }
 
     public void registrationBaction(ActionEvent actionEvent) {

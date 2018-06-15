@@ -1,3 +1,8 @@
+import javafx.beans.binding.StringBinding;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -10,6 +15,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.awt.*;
@@ -40,7 +48,6 @@ public class UserController {
      *              general fields used        */
 
     private final String pattern = "yyyy-MM-dd";
-    //Connection connection;
     private StringBuilder roomType;
     private int idRoom;
     int idGast;
@@ -107,9 +114,10 @@ public class UserController {
     public void initialize(){
         setConverter();
         //proper 'select room type' initializer
-        MenuItem mi = new MenuItem("Doesn't matter");
-        mi.setOnAction(e -> selRoomTypeMB.setText(mi.getText()));
-        selRoomTypeMB.getItems().add(mi);
+        /*MenuItem mi = new MenuItem("Doesn't matter");
+        mi.setOnAction(e -> {
+                selRoomTypeMB.setText(mi.getText());});
+        selRoomTypeMB.getItems().add(mi);*/
     }
 
     private void setConverter(){
@@ -169,10 +177,50 @@ public class UserController {
             String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + ";";
             Statement statement = Model.connection.createStatement();
             ResultSet rs = statement.executeQuery(selectVisits);
-            while(rs.next()){
-                //TODO = przegladnie rezerwacji
+            TableView table = new TableView();
+            ObservableList<ObservableList> data;
+            data = FXCollections.observableArrayList();
+            for(int i=0 ; i<rs.getMetaData().getColumnCount(); i++){
+                final int j = i;
+                TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i+1));
+                col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList,String>,ObservableValue<String>>(){
+                    public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
+                        try {
+                            return new SimpleStringProperty(param.getValue().get(j).toString());
+                        }catch (Exception e){
+                            return new SimpleStringProperty("");
+                        }
+                    }
+                });
+
+                table.getColumns().addAll(col);
             }
+
+            while(rs.next()){
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for(int i=1 ; i<=rs.getMetaData().getColumnCount(); i++){
+                    row.add(rs.getString(i));
+                }
+                data.add(row);
+
+            }
+
+            table.setItems(data);
+
+            final VBox vbox = new VBox();
+            vbox.setSpacing(5);
+            vbox.getChildren().add( table);
+            while(rs.next()){
+                table.getItems().add(new Object());
+            }
+
+            Stage stageVisits = new Stage();
+            stageVisits.setTitle("My visits and reservations");
+            stageVisits.setScene(new Scene(vbox));
+            stageVisits.show();
+
         }catch (Exception e){
+            e.printStackTrace();
             System.err.println(e.getMessage());
         }
     }
@@ -208,9 +256,9 @@ public class UserController {
                 int price = rs2.getInt("cena");
                 //insert into
                 String insert = "insert into rezerwacje_pokoje values ("+mainReserveId+ ", default, " + pair.t.idRoom +", '"+ pair.t.checkinDate + "'::date, '" + pair.t.checkoutDate +"'::date, " + price + ", 'G', " + pair.t.amountOfPeople + ", default);";
-                System.out.println(insert);
+                //System.out.println(insert);
                 statement.executeUpdate(insert);
-                String selectIdOne = "select id_rez_pojedynczej from rezerwacje_pokoje order by 2 desc limit 1;";
+                String selectIdOne = "select id_rez_pojedynczej from rezerwacje_pokoje order by 1 desc limit 1;";
                 ResultSet rs3 = statement.executeQuery(selectIdOne);
                 rs3.next();
                 int idOneRes =rs3.getInt("id_rez_pojedynczej") ;
@@ -228,14 +276,13 @@ public class UserController {
                         daysServices = rs5.getInt("days");
                         priceToUpdate += rs4.getInt("cena") * daysServices * service.number;
                 }
-                String upadte = "update rezerwacje_pokoje set cena = " + priceToUpdate + ";";
+                String upadte = "update rezerwacje_pokoje set cena = " + priceToUpdate + " where id_rez_pojedynczej =" + idOneRes + ";";
                 statement.executeUpdate(upadte);
             }
             reservations.clear();
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
-        //TODO= wyczyscic guziki, bo sie doda kilka razy
 
     }
 
@@ -317,7 +364,7 @@ public class UserController {
                     });
                     nextMI.setOnAction( e ->{
                         setRoomType(nextMI.getText());
-                        System.out.println(nextMI.getText());
+                        //System.out.println(nextMI.getText());
                     });
                     selRoomTypeMB.getItems().add(nextMI);
                 }
@@ -342,7 +389,7 @@ public class UserController {
     //returns true if data was proper and false otherwise
     private boolean addCurrentState() {
         try {
-            System.out.println(checkinTF.getText() + " " + checkoutTF.getText() + " " + Integer.parseInt(peopleTextField.getText()) + " " + selRoomTypeMB.getAccessibleText() + " " + roomType.toString());
+            //System.out.println(checkinTF.getText() + " " + checkoutTF.getText() + " " + Integer.parseInt(peopleTextField.getText()) + " " + selRoomTypeMB.getAccessibleText() + " " + roomType.toString());
             Reservation reservation = new Reservation(checkinTF.getText(), checkoutTF.getText(), Integer.parseInt(peopleTextField.getText()), roomType.toString(), idRoom);
             reservations.add(new Pair<Reservation, List<Services>>(reservation, new ArrayList<>()));
             return true;
