@@ -4,8 +4,8 @@ user=$USER
 #sudo su -l postgres -c "createdb hotel --owner='$name' --no-password" 2&> /dev/null
 
 
-rm generator/userspasswords.txt
-touch generator/userspasswords.txt
+rm userspasswords.txt
+touch userspasswords.txt
 #checking all project requirements before start
 echo "Checking if python3 is installed..."
 hash python3 2> /dev/null || { echo "Seems like you have no Python3 installed, aborting..."; exit 1; }

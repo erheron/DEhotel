@@ -57,7 +57,7 @@ class maker:
 			#generating pseudo-random email
 			email= faker.email()
 			hash = self.hash_email(email)
-			print(email + '---' + str(hash), file=open("userspasswords.txt","a"))
+			print('<email>:' + email + '     <password>:' + email, file=open("userspasswords.txt","a"))
 			if(hash == -1): continue
 			cur.execute('INSERT INTO email_hash VALUES (%s, %s)', (email, hash,))
 			tel_number='0' + str(random_with_N_digits(8))

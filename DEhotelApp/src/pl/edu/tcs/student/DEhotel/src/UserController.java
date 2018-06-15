@@ -105,8 +105,11 @@ public class UserController {
      *                      1                       */
 
     public void initialize(){
-        //show login window
         setConverter();
+        //proper 'select room type' initializer
+        MenuItem mi = new MenuItem("Doesn't matter");
+        mi.setOnAction(e -> selRoomTypeMB.setText(mi.getText()));
+        selRoomTypeMB.getItems().add(mi);
     }
 
     private void setConverter(){
@@ -303,6 +306,8 @@ public class UserController {
                                     "where (data_od >= '"+ checkinTF.getText() +"'::date and data_od < '"+ checkoutTF.getText() + "'::date) or " +
                                     "(data_do > '" + checkinTF.getText() +"'::date and data_do <= '"+ checkoutTF.getText()+ "'::date ));";
                 String roomType;
+                String select = "select distinct typ from pokoje where max_liczba_osob >= "+ Integer.parseInt(peopleTextField.getText()) +"order by 1;";
+                String roomType;//next
                 ResultSet rs = stmt.executeQuery(select);
                 while(rs.next()){
                     roomType = rs.getString("typ") ;
