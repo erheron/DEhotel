@@ -89,8 +89,11 @@ public class UserController {
      *                      1                       */
 
     public void initialize(){
-        //show login window
         setConverter();
+        //proper 'select room type' initializer
+        MenuItem mi = new MenuItem("Doesn't matter");
+        mi.setOnAction(e -> selRoomTypeMB.setText(mi.getText()));
+        selRoomTypeMB.getItems().add(mi);
     }
 
     private void setConverter(){
@@ -211,7 +214,7 @@ public class UserController {
             try {
                 Statement stmt = connection.createStatement();
                 selRoomTypeMB.getItems().removeIf(e -> !e.getText().equals("Doesn't matter"));
-                String select = "select distinct typ from pokoje where max_liczba_osob >= "+ Integer.parseInt(peopleTextField.getText()) +";";
+                String select = "select distinct typ from pokoje where max_liczba_osob >= "+ Integer.parseInt(peopleTextField.getText()) +"order by 1;";
                 String roomType;//next
                 ResultSet rs = stmt.executeQuery(select);
                 while(rs.next()){//TODO
