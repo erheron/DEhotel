@@ -78,13 +78,12 @@ public class Model extends Application {
         }
 
         try {
-            File file = new File("dataConnection");
+            //File file = new File("dataConnection");
 
-            BufferedReader br = new BufferedReader(new FileReader(file));
+            //BufferedReader br = new BufferedReader(new FileReader(file));
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE THAT VALUES TO YOUR ACTUAL DATA!!!!!!!!!!!!!!!!!!!!!
             connection = DriverManager.getConnection(
-                    br.readLine(), br.readLine(),
-                    br.readLine());
-
+                    "jdbc:postgresql://localhost:5432/hotel", "erheron", "erheron");
         } catch (Exception e) {
             System.out.println("Connection Failed!");
             e.printStackTrace();
