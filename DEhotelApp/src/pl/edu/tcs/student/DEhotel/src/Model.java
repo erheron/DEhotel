@@ -11,7 +11,7 @@ public class Model extends Application {
     private AdminController adminController;
     private LoginController loginController;
     private Integer showUserForm = null;
-    private Connection connection;
+    public static Connection connection;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -25,7 +25,6 @@ public class Model extends Application {
         FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("login.fxml"));
         AnchorPane loginRoot = loginLoader.load();
         loginController = loginLoader.getController();
-        loginController.addConnection(connection);
         loginController.loginBPressed.addListener(e -> {
             showUserForm = loginController.tryLogin();
             loginStage.close();
@@ -42,7 +41,6 @@ public class Model extends Application {
             AnchorPane userFormRoot = userLoader.load();
             userController = userLoader.getController();
             userController.usernameLabel.setText(loginController.userName);
-            userController.connection = this.connection;
             userController.idGast = loginController.idGast;
             Scene userScene = new Scene(userFormRoot);
             primaryStage.setScene(userScene);
