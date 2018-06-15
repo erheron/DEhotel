@@ -305,8 +305,6 @@ public class UserController {
                                 " and not exists (select id_rez_pojedynczej from rezerwacje_pokoje " +
                                     "where (data_od >= '"+ checkinTF.getText() +"'::date and data_od < '"+ checkoutTF.getText() + "'::date) or " +
                                     "(data_do > '" + checkinTF.getText() +"'::date and data_do <= '"+ checkoutTF.getText()+ "'::date ));";
-                String roomType;
-                String select = "select distinct typ from pokoje where max_liczba_osob >= "+ Integer.parseInt(peopleTextField.getText()) +"order by 1;";
                 String roomType;//next
                 ResultSet rs = stmt.executeQuery(select);
                 while(rs.next()){
