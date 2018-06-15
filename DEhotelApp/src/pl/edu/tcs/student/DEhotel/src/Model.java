@@ -27,13 +27,17 @@ public class Model extends Application {
         loginController = loginLoader.getController();
         loginController.loginBPressed.addListener(e -> {
             showUserForm = loginController.tryLogin();
-            loginStage.close();
+            if(showUserForm != 2 && showUserForm != null) {
+                loginStage.close();
+            }
+            else{
+                loginController = loginLoader.getController();
+            }
         });
         Scene loginScene = new Scene(loginRoot);
         loginStage.setScene(loginScene);
         loginStage.showAndWait();
-
-        if(Objects.equals(showUserForm, null) || showUserForm == 2){
+        if(Objects.equals(showUserForm, null)){
             System.exit(0);
         }
         if(showUserForm == 1) {
@@ -72,8 +76,8 @@ public class Model extends Application {
         try {
 
             connection = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/hotel", "erheron",
-                    "erheron");
+                    "jdbc:postgresql://localhost:5432/postgres", "postgres",
+                    "kasia123");
 
         } catch (SQLException e) {
             System.out.println("Connection Failed!");
