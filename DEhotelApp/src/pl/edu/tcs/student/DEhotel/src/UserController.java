@@ -1,4 +1,5 @@
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -54,7 +55,14 @@ public class UserController {
     private StringBuilder roomType;
     private int idRoom;
     int idGast;
-    //list for reservations
+
+    //field for confirmation from pressing 'reserve all'
+    private enum ConfirmationStatus{
+        Default,
+        Confirmed,
+        Back
+    }
+    ConfirmationStatus confirmationStatus;
 
     public class Pair<T, U> {
         T t;
@@ -65,7 +73,7 @@ public class UserController {
         }
     }
     private class Reservation{
-        String checkinDate, checkoutDate;    
+        String checkinDate, checkoutDate;
         int amountOfPeople;
         String roomType;
         int idRoom;
@@ -253,6 +261,10 @@ public class UserController {
     public void mainReserveBaction(ActionEvent actionEvent) {
         addCurrentState();
         try {
+            showTotalConfirmation();//confirmation status is updated here
+            if(confirmationStatus == ConfirmationStatus.Back){
+                return;//TODO=client want back, sooooo...? what to do?
+            }
             Statement statement = Model.connection.createStatement();
             String mainReserve = "insert into rezerwacje_goscie values (default, "+ idGast + ");";
             statement.executeUpdate(mainReserve);
@@ -288,11 +300,11 @@ public class UserController {
                         daysServices = rs5.getInt("days");
                         priceToUpdate += rs4.getInt("cena") * daysServices * service.number;
                 }
-                String upadte = "update rezerwacje_pokoje set cena = " + priceToUpdate + " where id_rez_pojedynczej =" + idOneRes + ";";
-                statement.executeUpdate(upadte);
+                String update = "update rezerwacje_pokoje set cena = " + priceToUpdate + " where id_rez_pojedynczej =" + idOneRes + ";";
+                statement.executeUpdate(update);
+                changeConfirmationStatus(ConfirmationStatus.Default);
             }
             reservations.clear();
-            showTotalConfirmation();
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -449,8 +461,8 @@ public class UserController {
     private void bringToSeeVisitsState(){
         calendarLabel.setText("Select date from/to");
     }
-    
-    void showTotalConfirmation(){
+
+    boolean showTotalConfirmation(){
         try {
             Stage confirmStage = new Stage();
             confirmStage.initModality(Modality.WINDOW_MODAL);
@@ -462,17 +474,24 @@ public class UserController {
             confirmStage.setScene(resConfirmScene);
             resConfirmController.backB.setOnAction(e -> {
                 confirmStage.close();
+                changeConfirmationStatus(ConfirmationStatus.Confirmed);
             });
             resConfirmController.confirmB.setOnAction(e -> {
                //TODO
-               confirmStage.close(); 
+                changeConfirmationStatus(ConfirmationStatus.Back);
+               confirmStage.close();
             });
             confirmStage.show();
         }catch(IOException e){
             e.printStackTrace();
         }
+        return false;
     }
 
+    private void changeConfirmationStatus(ConfirmationStatus s){
+        confirmationStatus = s;
+        return;
+    }
     /*----------------end of block------------------
      *                      7                     */
 
