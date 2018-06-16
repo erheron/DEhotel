@@ -1,10 +1,11 @@
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -13,14 +14,15 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
-import java.awt.*;
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -44,9 +46,10 @@ public class UserController {
     @FXML public Button oneMoreResB;
     @FXML public Button extraServicesB;
     @FXML public MenuButton selRoomTypeMB;
+
     /*----------------------1-------------------
      *              general fields used        */
-
+    private ReserveConfirmationController resConfirmController;
     private final String pattern = "yyyy-MM-dd";
     private StringBuilder roomType;
     private int idRoom;
@@ -109,8 +112,11 @@ public class UserController {
 
     }
     /*----------------end of block------------------
-     *                      1                       */
+     *                      2                       */
 
+
+    /*----------------------3-------------------
+     *              initializer and similar methods        */
     public void initialize(){
         setConverter();
         //proper 'select room type' initializer
@@ -142,6 +148,11 @@ public class UserController {
         };
         calendar.setConverter(converter);
     }
+    /*----------------end of block------------------
+     *                      3                       */
+
+    /*----------------------4---------------------
+     *              bunch of handlers            */
     public void checkinButtonOnAction(ActionEvent actionEvent) {
         LocalDate date = checkinDate;
         checkinDate = calendar.getValue();
@@ -151,8 +162,6 @@ public class UserController {
         }
         checkinTF.setText(calendar.getConverter().toString(calendar.getValue()));
         calendarLabel.setText("Select check-out date");
-
-
     }
 
     public void checkoutButtonOnAction(ActionEvent actionEvent) {
@@ -168,12 +177,12 @@ public class UserController {
 
     public void reserveButtonOnAction(ActionEvent actionEvent) {
         setAllVisible();
-
-
     }
 
     public void seeMyVisitsButtonOnAction(ActionEvent actionEvent) {
         try {
+            bringToSeeVisitsState();
+            showDateChooser();
             String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + ";";
             Statement statement = Model.connection.createStatement();
             ResultSet rs = statement.executeQuery(selectVisits);
@@ -225,7 +234,10 @@ public class UserController {
         }
     }
 
-    /*----------------------10---------------------
+    /*----------------end of block------------------
+     *                      4                       */
+
+    /*----------------------5---------------------
      *         bunch of checker  methods            */
     private boolean checkDates(){
         if(checkinDate == null) return false;
@@ -233,10 +245,10 @@ public class UserController {
     }
 
     /*----------------end of block------------------
-     *                      10                      */
+     *                      5                      */
 
 
-    /*----------------------11---------------------
+    /*----------------------6---------------------
      *           bunch of handler  methods            */
     public void mainReserveBaction(ActionEvent actionEvent) {
         addCurrentState();
@@ -280,6 +292,7 @@ public class UserController {
                 statement.executeUpdate(upadte);
             }
             reservations.clear();
+            showTotalConfirmation();
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -310,9 +323,9 @@ public class UserController {
         }
     }
     /*----------------end of block------------------
-     *                      11                    */
+     *                      6                    */
 
-    /*----------------------12---------------------
+    /*----------------------7---------------------
      *           bunch of helper  methods            */
     private void setAllVisible() {
         calendar.setVisible(true);
@@ -346,6 +359,8 @@ public class UserController {
             try {
                 Statement stmt = Model.connection.createStatement();
                 selRoomTypeMB.getItems().removeIf(e -> !e.getText().equals("Doesn't matter"));
+                //TODO=Kasiu, zly select, wybiera za duzo, bo wybiera pary, dlatego 'distinct' nie dziala jak powinien
+                //TODO=jesli w peopleTextField nic nie ma, ogarnac jakas domyslna wartość
                 String select = "select distinct typ, id_pokoju " +
                                 "from pokoje" +
                                 " where max_liczba_osob >= " + Integer.parseInt(peopleTextField.getText()) +
@@ -399,12 +414,66 @@ public class UserController {
         }
     }
 
+    private void showDateChooser() {
+        Stage stage = new Stage();
+        stage.setWidth(400);
+        stage.setHeight(300);
+        String date_from = null;
+        final String date_to = null;
+        stage.setTitle("Select date from/to");
+        StackPane pane = new StackPane();
+        TextField dfrom = new TextField();
+        TextField dto = new TextField();
+        Button submit = new Button("Submit");
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        vBox.getChildren().add(dfrom);
+        vBox.getChildren().add(dto);
+        pane.getChildren().add(vBox);
+        vBox.getChildren().add(submit);
+        submit.setOnAction(e -> {
+            //TODO=transfer data from that form to controller and SQL query
+            stage.close();
+        });
+        dfrom.setPromptText("Insert date from, format DD-MM-YYYY");
+        dto.setPromptText("Insert date to, format DD-MM-YYYY");
+        dfrom.setFocusTraversable(false);
+        dto.setFocusTraversable(false);
+        pane.setAlignment(vBox, Pos.CENTER);
+        Scene scene = new Scene(pane);
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.setScene(scene);
+        stage.showAndWait();
+
+    }
+    private void bringToSeeVisitsState(){
+        calendarLabel.setText("Select date from/to");
+    }
+    
+    void showTotalConfirmation(){
+        try {
+            Stage confirmStage = new Stage();
+            confirmStage.initModality(Modality.WINDOW_MODAL);
+            confirmStage.setTitle("Please, confirm all your reservations");
+            FXMLLoader resLoader = new FXMLLoader(getClass().getResource("reserveConfirmationForm.fxml"));
+            AnchorPane resConfirmRoot = resLoader.load();
+            resConfirmController = resLoader.getController();
+            Scene resConfirmScene = new Scene(resConfirmRoot);
+            confirmStage.setScene(resConfirmScene);
+            resConfirmController.backB.setOnAction(e -> {
+                confirmStage.close();
+            });
+            resConfirmController.confirmB.setOnAction(e -> {
+               //TODO
+               confirmStage.close(); 
+            });
+            confirmStage.show();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
     /*----------------end of block------------------
-     *                      12                    */
-
-
-
-
-
+     *                      7                     */
 
 }
