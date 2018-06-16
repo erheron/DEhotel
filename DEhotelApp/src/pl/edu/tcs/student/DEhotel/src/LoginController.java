@@ -115,6 +115,7 @@ public class LoginController {
             FXMLLoader registrationLoader = new FXMLLoader(getClass().getResource("registrationForm.fxml"));
             AnchorPane regFormRoot = registrationLoader.load();
             Stage registrationStage  = new Stage();
+            registrationStage.setTitle("Register");
             registrationStage.initModality(Modality.WINDOW_MODAL);
             registrationStage.initOwner(root.getScene().getWindow());
             registrationController = registrationLoader.getController();

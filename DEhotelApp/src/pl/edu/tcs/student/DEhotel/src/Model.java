@@ -31,8 +31,7 @@ public class Model extends Application {
         loginController = loginLoader.getController();
         loginController.loginB.setOnAction(e -> {
             showUserForm = loginController.tryLogin();
-            if(showUserForm != 2 && showUserForm != null) {
-
+            if(showUserForm != 2) {
                 loginStage.close();
             }
             else{
@@ -42,7 +41,7 @@ public class Model extends Application {
         Scene loginScene = new Scene(loginRoot);
         loginStage.setScene(loginScene);
         loginStage.showAndWait();
-        if(Objects.equals(showUserForm, null)){
+        if(Objects.equals(showUserForm, null) || Objects.equals(showUserForm, 2)){
             System.exit(0);
         }
         if(showUserForm == 1) {
