@@ -1,6 +1,3 @@
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -20,7 +18,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
@@ -29,6 +26,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.*;
 
 public class UserController {
 
@@ -53,8 +51,9 @@ public class UserController {
     private ReserveConfirmationController resConfirmController;
     private final String pattern = "yyyy-MM-dd";
     private StringBuilder roomType;
-    private int idRoom;
     int idGast;
+    private int actualPrice;
+
 
     //field for confirmation from pressing 'reserve all'
     private enum ConfirmationStatus{
@@ -72,21 +71,23 @@ public class UserController {
             this.u = u;
         }
     }
-    private class Reservation{
+    class Reservation{
         String checkinDate, checkoutDate;
         int amountOfPeople;
         String roomType;
         int idRoom;
+        int price;
 
-        Reservation(String indate,String outdate, int i, String type, int id){
+        Reservation(String indate,String outdate, int i, String type, int id, int price){
             checkinDate = indate;
             checkoutDate = outdate;
             amountOfPeople = i;
             roomType = type;
             idRoom = id;
+            this.price = price;
         }
     }
-    private class Services{
+    class Services{
         String services;
         String dateFrom;
         String dateTo;
@@ -102,9 +103,7 @@ public class UserController {
         }
     }
 
-    private List<Pair<Reservation, List<Services>> > reservations = new ArrayList<>();
-    List<Services> curServices;
-    Reservation curReservation;
+    List<Pair<Reservation, List<Services>> > reservations = new ArrayList<>();
     private LocalDate checkinDate, checkoutDate;
 
     /*----------------end of block------------------
@@ -191,51 +190,6 @@ public class UserController {
         try {
             bringToSeeVisitsState();
             showDateChooser();
-            String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + ";";
-            Statement statement = Model.connection.createStatement();
-            ResultSet rs = statement.executeQuery(selectVisits);
-            TableView table = new TableView();
-            ObservableList<ObservableList> data;
-            data = FXCollections.observableArrayList();
-            for(int i=0 ; i<rs.getMetaData().getColumnCount(); i++){
-                final int j = i;
-                TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i+1));
-                col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ObservableList,String>,ObservableValue<String>>(){
-                    public ObservableValue<String> call(TableColumn.CellDataFeatures<ObservableList, String> param) {
-                        try {
-                            return new SimpleStringProperty(param.getValue().get(j).toString());
-                        }catch (Exception e){
-                            return new SimpleStringProperty("");
-                        }
-                    }
-                });
-
-                table.getColumns().addAll(col);
-            }
-
-            while(rs.next()){
-                ObservableList<String> row = FXCollections.observableArrayList();
-                for(int i=1 ; i<=rs.getMetaData().getColumnCount(); i++){
-                    row.add(rs.getString(i));
-                }
-                data.add(row);
-
-            }
-
-            table.setItems(data);
-
-            final VBox vbox = new VBox();
-            vbox.setSpacing(5);
-            vbox.getChildren().add( table);
-            while(rs.next()){
-                table.getItems().add(new Object());
-            }
-
-            Stage stageVisits = new Stage();
-            stageVisits.setTitle("My visits and reservations");
-            stageVisits.setScene(new Scene(vbox));
-            stageVisits.show();
-
         }catch (Exception e){
             e.printStackTrace();
             System.err.println(e.getMessage());
@@ -252,6 +206,18 @@ public class UserController {
         return checkinDate.isBefore(checkoutDate);
     }
 
+    private void checkOtherMyReservations(){
+        if(reservations.isEmpty())
+                return;
+
+    }
+
+    private boolean checkDateFormat(String date){
+        Pattern pattern2 = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2}");
+        Matcher matcher = pattern2.matcher(date);
+        return matcher.matches();
+    }
+
     /*----------------end of block------------------
      *                      5                      */
 
@@ -260,60 +226,15 @@ public class UserController {
      *           bunch of handler  methods            */
     public void mainReserveBaction(ActionEvent actionEvent) {
         addCurrentState();
-        try {
-            showTotalConfirmation();//confirmation status is updated here
-            if(confirmationStatus == ConfirmationStatus.Back){
-                return;//TODO=client want back, sooooo...? what to do?
-            }
-            Statement statement = Model.connection.createStatement();
-            String mainReserve = "insert into rezerwacje_goscie values (default, "+ idGast + ");";
-            statement.executeUpdate(mainReserve);
-            String selectID = "select id_rez_zbiorczej from rezerwacje_goscie order by 1 desc limit 1;";
-            ResultSet rs = statement.executeQuery(selectID);
-            rs.next();
-            int mainReserveId = rs.getInt("id_rez_zbiorczej");
-            for(Pair<Reservation, List<Services>> pair : reservations){
-                //price
-                String selectPrice ="select oblicz_znizke(" + idGast + ",cena_podstawowa * ('" + pair.t.checkoutDate + "'::date - '" + pair.t.checkinDate + "'::date)) as cena from pokoje where id_pokoju = " + pair.t.idRoom + ";";
-                ResultSet rs2 = statement.executeQuery(selectPrice);
-                rs2.next();
-                int price = rs2.getInt("cena");
-                //insert into
-                String insert = "insert into rezerwacje_pokoje values ("+mainReserveId+ ", default, " + pair.t.idRoom +", '"+ pair.t.checkinDate + "'::date, '" + pair.t.checkoutDate +"'::date, " + price + ", 'G', " + pair.t.amountOfPeople + ", default);";
-                //System.out.println(insert);
-                statement.executeUpdate(insert);
-                String selectIdOne = "select id_rez_pojedynczej from rezerwacje_pokoje order by 1 desc limit 1;";
-                ResultSet rs3 = statement.executeQuery(selectIdOne);
-                rs3.next();
-                int idOneRes =rs3.getInt("id_rez_pojedynczej") ;
-                int priceToUpdate = price;
-                //add services
-                for(Services service : pair.u){
-                        String selectIdAndPrice = "select id_uslugi_dod, cena from uslugi_dod where nazwa = " + service.services + ";";
-                        ResultSet rs4 = statement.executeQuery(selectIdAndPrice);
-                        rs4.next();
-                        String insertServices = "insert into usl_rez values (" + rs4.getInt("id_uslugi_dod")+", "+ idOneRes + ", " + service.number + ", '" +service.dateFrom + "'::date, '"+ service.dateTo + "'::date, default);";
-                        statement.executeUpdate(insertServices);
-                        int daysServices;
-                        String daysServicesSelect = "select '" + service.dateTo + "'::date - '" + service.dateFrom + "'::date as days;";
-                        ResultSet rs5 = statement.executeQuery(daysServicesSelect);
-                        daysServices = rs5.getInt("days");
-                        priceToUpdate += rs4.getInt("cena") * daysServices * service.number;
-                }
-                String update = "update rezerwacje_pokoje set cena = " + priceToUpdate + " where id_rez_pojedynczej =" + idOneRes + ";";
-                statement.executeUpdate(update);
-                changeConfirmationStatus(ConfirmationStatus.Default);
-            }
-            reservations.clear();
-        }catch (Exception e){
-            System.out.println(e.getMessage());
+        showTotalConfirmation();//confirmation status is updated here
+        if(confirmationStatus == ConfirmationStatus.Back) {
+            return;//TODO=client want back, sooooo...? what to do?
         }
-
+       bringToInitialState();
     }
 
     public void oneMoreResBaction(ActionEvent actionEvent) {
         addCurrentState();
-        //add current state to "reservation" list
         bringToInitialState();
     }
     public void extraServicesBaction(ActionEvent actionEvent) {
@@ -329,7 +250,15 @@ public class UserController {
                 names.add(rs.getString("nazwa"));
                 prices.add(rs.getInt("cena"));
             }
-            //TODO wyswietlanie i wybor uslug, wybor dat i liczby
+            //!!!!!!!!!!!PO DODANIU USLUGI
+            /*
+            String selectIdAndPrice = "select id_uslugi_dod, cena from uslugi_dod where nazwa = " + wybranaUluga + ";";
+            ResultSet rs4 = statement.executeQuery(selectIdAndPrice);
+            rs4.next();
+            int daysServices = policzyc dni;
+            int amount = liczba dni;
+            actualPrice += rs4.getInt("id_uslugi_dod") *daysServices * amount ;*/
+            //TODO = wybieranie uslug
         }catch (Exception e){
             System.err.println(e.getMessage());
         }
@@ -371,33 +300,37 @@ public class UserController {
             try {
                 Statement stmt = Model.connection.createStatement();
                 selRoomTypeMB.getItems().removeIf(e -> !e.getText().equals("Doesn't matter"));
-                //TODO=Kasiu, zly select, wybiera za duzo, bo wybiera pary, dlatego 'distinct' nie dziala jak powinien
-                //TODO=jesli w peopleTextField nic nie ma, ogarnac jakas domyslna wartość
-                String select = "select distinct typ, id_pokoju " +
-                                "from pokoje" +
-                                " where max_liczba_osob >= " + Integer.parseInt(peopleTextField.getText()) +
-                                " and not exists (select id_rez_pojedynczej from rezerwacje_pokoje " +
-                                    "where (data_od >= '"+ checkinTF.getText() +"'::date and data_od < '"+ checkoutTF.getText() + "'::date) or " +
-                                    "(data_do > '" + checkinTF.getText() +"'::date and data_do <= '"+ checkoutTF.getText()+ "'::date )" +
-                                    " or (data_od <= '" + checkinTF.getText() +"'::date and data_do >= '"+ checkoutTF.getText()+ "'::date ));";
-                String roomType;//next
+                int peopleAmount;
+                if(peopleTextField.getText().equals(""))
+                    peopleAmount = 1;
+                else
+                    peopleAmount = Integer.parseInt(peopleTextField.getText());
+                String createView = "create or replace view reserved as " +
+                                        "select typ, id_pokoju " +
+                                        "from pokoje natural join rezerwacje_pokoje "+
+                                        "where max_liczba_osob >= " +peopleAmount +
+                                        " and (('" + checkinTF.getText() + "'::date < data_od and data_od < '" + checkoutTF.getText() + "'::date) or "+
+                                        " ('"+checkinTF.getText() +"'::date < data_do and data_do < '" + checkoutTF.getText() + "'::date) or " +
+                                        " (data_od <= '" + checkinTF.getText() + "'::date and '" + checkoutTF.getText() + "'::date <= data_do )) and anulowane_data is null;";
+                stmt.executeUpdate(createView);
+                String select = "select distinct typ" +
+                                " from pokoje "+
+                                " where max_liczba_osob >= " +peopleAmount + " and id_pokoju not in " +
+                                "(select id_pokoju from reserved);";
+                String roomType;
                 ResultSet rs = stmt.executeQuery(select);
                 while(rs.next()){
                     roomType = rs.getString("typ") ;
-                    idRoom = rs.getInt("id_pokoju");
                     MenuItem nextMI = new MenuItem();
                     nextMI.setText(roomType);
                     nextMI.setOnAction(e -> {
                         selRoomTypeMB.setText(nextMI.getText());
                     });
-                    nextMI.setOnAction( e ->{
-                        setRoomType(nextMI.getText());
-                        //System.out.println(nextMI.getText());
-                    });
                     selRoomTypeMB.getItems().add(nextMI);
                 }
                 rs.close();
             }catch(Exception e){
+                e.printStackTrace();
                 System.err.println(e.getMessage());
             }
         }
@@ -417,11 +350,22 @@ public class UserController {
     //returns true if data was proper and false otherwise
     private boolean addCurrentState() {
         try {
-            //System.out.println(checkinTF.getText() + " " + checkoutTF.getText() + " " + Integer.parseInt(peopleTextField.getText()) + " " + selRoomTypeMB.getAccessibleText() + " " + roomType.toString());
-            Reservation reservation = new Reservation(checkinTF.getText(), checkoutTF.getText(), Integer.parseInt(peopleTextField.getText()), roomType.toString(), idRoom);
+            Statement statement = Model.connection.createStatement();
+            String select = "select id_pokoju from pokoje where typ = '" + selRoomTypeMB.getText()  + "' and id_pokoju not in (select id_pokoju from reserved);";
+            ResultSet rs = statement.executeQuery(select);
+            rs.next();
+            int idRoom = rs.getInt("id_pokoju");
+            String selectPrice ="select oblicz_znizke(" + idGast + ", (" + actualPrice +"cena_podstawowa) * ('" + checkoutTF.getText() + "'::date - '" + checkinTF.getText() + "'::date)) as cena from pokoje where id_pokoju = " + idRoom + ";";
+            ResultSet rs2 = statement.executeQuery(selectPrice);
+            rs2.next();
+            int price = rs2.getInt("cena");
+            Reservation reservation = new Reservation(checkinTF.getText(), checkoutTF.getText(), Integer.parseInt(peopleTextField.getText()), selRoomTypeMB.getText(), idRoom, price);
             reservations.add(new Pair<Reservation, List<Services>>(reservation, new ArrayList<>()));
+            String drop = "drop view if exists reserved";
+            statement.executeUpdate(drop);
             return true;
         }catch (Exception e){
+            e.printStackTrace();
             return false;
         }
     }
@@ -444,11 +388,20 @@ public class UserController {
         pane.getChildren().add(vBox);
         vBox.getChildren().add(submit);
         submit.setOnAction(e -> {
-            //TODO=transfer data from that form to controller and SQL query
-            stage.close();
+            if(!checkDateFormat(dfrom.getText()) || !checkDateFormat(dfrom.getText())){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Incorrect data!");
+                alert.setContentText("Please, enter dates in correct format YYYY-MM-DD.");
+                alert.showAndWait();
+            }
+            else {
+                addTableView(dfrom.getText(), dto.getText());
+            }
+           // stage.close();
         });
-        dfrom.setPromptText("Insert date from, format DD-MM-YYYY");
-        dto.setPromptText("Insert date to, format DD-MM-YYYY");
+        dfrom.setPromptText("Insert date from, format YYYY-MM-DD");
+        dto.setPromptText("Insert date to, format YYYY-MM-DD");
         dfrom.setFocusTraversable(false);
         dto.setFocusTraversable(false);
         pane.setAlignment(vBox, Pos.CENTER);
@@ -456,6 +409,48 @@ public class UserController {
         stage.initModality(Modality.WINDOW_MODAL);
         stage.setScene(scene);
         stage.showAndWait();
+
+    }
+    void  addTableView(String dFrom, String dTO){
+        try {
+            String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date ;";
+            Statement statement = Model.connection.createStatement();
+            ResultSet rs = statement.executeQuery(selectVisits);
+            TableView table = new TableView();
+            TableColumn idResTC = new TableColumn("Id reservation");
+            TableColumn fromTC = new TableColumn("Check in");
+            TableColumn toTC = new TableColumn("Chceck out");
+            TableColumn priceTC = new TableColumn("Price");
+
+            ObservableList<ReserveConfirmationController.ReservationTableView> data =
+                    FXCollections.observableArrayList();
+            while (rs.next()) {
+                data.add(new ReserveConfirmationController.ReservationTableView(rs.getString("id_rez_zbiorczej"), rs.getString("data_od"), rs.getString("data_do"), rs.getInt("cena")));
+            }
+
+            idResTC.setCellValueFactory(
+                    new PropertyValueFactory<>("room"));
+            fromTC.setCellValueFactory(
+                    new PropertyValueFactory<>("checkIn"));
+            toTC.setCellValueFactory(
+                    new PropertyValueFactory<>("checkOut"));
+            priceTC.setCellValueFactory(
+                    new PropertyValueFactory<>("price"));
+
+            table.setItems(data);
+            table.getColumns().addAll(idResTC, fromTC, toTC, priceTC);
+
+            VBox vbox = new VBox();
+            vbox.setSpacing(5);
+            vbox.getChildren().add( table);
+            Stage stageVisits = new Stage();
+            stageVisits.setTitle("My visits and reservations");
+            stageVisits.setScene(new Scene(vbox));
+            stageVisits.show();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
     private void bringToSeeVisitsState(){
@@ -470,14 +465,38 @@ public class UserController {
             FXMLLoader resLoader = new FXMLLoader(getClass().getResource("reserveConfirmationForm.fxml"));
             AnchorPane resConfirmRoot = resLoader.load();
             resConfirmController = resLoader.getController();
+            resConfirmController.reservationList(reservations);
+            resConfirmController.setMainTableView();
+            resConfirmController.setTotalCostTF();
             Scene resConfirmScene = new Scene(resConfirmRoot);
             confirmStage.setScene(resConfirmScene);
             resConfirmController.backB.setOnAction(e -> {
-                confirmStage.close();
-                changeConfirmationStatus(ConfirmationStatus.Confirmed);
+
             });
             resConfirmController.confirmB.setOnAction(e -> {
-               //TODO
+                try{
+                    Statement statement = Model.connection.createStatement();
+                    String mainReserve = "insert into rezerwacje_goscie values (default, " + idGast + ");";
+                    statement.executeUpdate(mainReserve);
+                    String selectID = "select id_rez_zbiorczej from rezerwacje_goscie order by 1 desc limit 1;";
+                    ResultSet rs = statement.executeQuery(selectID);
+                    rs.next();
+                    int mainReserveId = rs.getInt("id_rez_zbiorczej");
+                    for (Pair<Reservation, List<Services>> pair : reservations) {
+                        //insert into
+                        String insert = "insert into rezerwacje_pokoje values (" + mainReserveId + ", default, " + pair.t.idRoom + ", '" + pair.t.checkinDate + "'::date, '" + pair.t.checkoutDate + "'::date, " + pair.t.price + ", 'G', " + pair.t.amountOfPeople + ", default);";
+                        //System.out.println(insert);
+                        statement.executeUpdate(insert);
+                        String selectIdOne = "select id_rez_pojedynczej from rezerwacje_pokoje order by 1 desc limit 1;";
+                        ResultSet rs3 = statement.executeQuery(selectIdOne);
+                        rs3.next();
+                        changeConfirmationStatus(ConfirmationStatus.Default);
+                    }
+                    reservations.clear();
+                }catch (Exception e2){
+                    System.out.println(e2.getMessage());
+                }
+                confirmStage.close();
                 changeConfirmationStatus(ConfirmationStatus.Back);
                confirmStage.close();
             });
