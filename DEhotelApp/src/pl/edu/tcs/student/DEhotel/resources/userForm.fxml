@@ -39,11 +39,17 @@
                             <padding>
                                 <Insets left="10.0" right="10.0" />
                             </padding>
+                     <font>
+                        <Font name="DejaVu Sans Bold" size="13.0" />
+                     </font>
                         </Label>
                         <Label fx:id="usernameLabel" lineSpacing="1.0" text="UserName">
                             <padding>
                                 <Insets left="10.0" right="10.0" />
                             </padding>
+                     <font>
+                        <Font name="DejaVu Sans Bold" size="13.0" />
+                     </font>
                         </Label>
                     </children>
                 </HBox>
@@ -65,8 +71,11 @@
                      </font>
                         </Button>
                         <TextField fx:id="checkoutTF" editable="false" focusTraversable="false" promptText="Check-out date" visible="false" />
+                  <Label fx:id="howManyPeopleL" alignment="CENTER" contentDisplay="CENTER" prefHeight="16.0" prefWidth="179.0" text="How many people?" visible="false">
+                     <font>
+                        <Font name="DejaVu Sans Bold" size="13.0" />
+                     </font></Label>
                   <TextField fx:id="peopleTextField" cacheShape="false" editable="false" onKeyPressed="#peopleInRoomAction" promptText="people in room" text="1" visible="false" />
-                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="16.0" prefWidth="179.0" text="How many people?" />
                   <MenuButton fx:id="selRoomTypeMB" mnemonicParsing="false" onAction="#selRoomTypeMBaction" prefHeight="26.0" prefWidth="161.0" text="Select room type" visible="false" />
                     </children>
                     <padding>
