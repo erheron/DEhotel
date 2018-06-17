@@ -1,3 +1,4 @@
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -219,7 +220,41 @@ public class UserController {
         dialog.initModality(Modality.WINDOW_MODAL);
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(number -> {
-            //TODO=parse number from A/B to int1, int2
+            try {
+                int i = 0;
+                StringBuilder mainID = new StringBuilder();
+                StringBuilder id = new StringBuilder();
+                if(!number.contains("/")){
+                    throw new Exception();
+                }
+                for (i = 0; i < number.length(); i++) {
+                    if (number.charAt(i)=='/')
+                        break;
+                    mainID.append(number.charAt(i));
+                }
+                i++;
+                for( ; i < number.length(); i++){
+                    id.append(number.charAt(i));
+                }
+                String cancel = "update rezerwacje_pokoje set anulowane_data = current_date  where id_rez_pojedynczej = " + Integer.parseInt(id.toString()) +" and id_rez_zbiorczej = " + Integer.parseInt(mainID.toString()) + ";";
+                Statement statement = Model.connection.createStatement();
+                statement.executeUpdate(cancel);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Reservation canceled");
+                alert.setHeaderText(null);
+                alert.setContentText("You cancel reservation " + number);
+                alert.showAndWait();
+
+            }catch (SQLException sql){
+                sql.printStackTrace();
+            }
+            catch (Exception e){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Dialog");
+                alert.setHeaderText("Incorrect data!");
+                alert.setContentText("Please, enter your reservation key in format A/B.");
+                alert.showAndWait();
+            }
         });
     }
 
@@ -545,6 +580,15 @@ public class UserController {
                     rs.next();
                     StringBuilder stringBuilder = new StringBuilder();
                     Integer mainReserveId = rs.getInt("id_rez_zbiorczej");
+                    int i=0;
+                    for(ReserveConfirmationController.ReservationTableView tableView : resConfirmController.data){
+                        if(tableView.isChecked().get()){
+                        }
+                        else{
+                            reservations.remove(i);
+                        }
+                        i++;
+                    }
                     for (Pair<Reservation, List<Services>> pair : reservations) {
                         //insert into
                         String insert = "insert into rezerwacje_pokoje values (" + mainReserveId + ", default, " + pair.t.idRoom + ", '" + pair.t.checkinDate + "'::date, '" + pair.t.checkoutDate + "'::date, " + pair.t.price + ", 'G', " + pair.t.amountOfPeople + ", default);";
