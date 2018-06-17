@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.List;
@@ -51,6 +52,7 @@ public class ReserveConfirmationController {
         TableColumn checkInTC = new TableColumn("Check in");
         TableColumn checkOutTC = new TableColumn("Check out");
         TableColumn priceTC = new TableColumn("Price");
+        TableColumn checkColumn = new TableColumn("Checked");
         ObservableList<ReservationTableView> data =
                 FXCollections.observableArrayList();
         for(UserController.Pair<UserController.Reservation, List<UserController.Services>> pair : list){
@@ -64,8 +66,11 @@ public class ReserveConfirmationController {
                 new PropertyValueFactory<>("checkOut"));
         priceTC.setCellValueFactory(
                 new PropertyValueFactory<>("price"));
+        checkColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
+        checkColumn.setCellValueFactory(
+                new PropertyValueFactory<>("true"));
         mainTableView.setItems(data);
-        mainTableView.getColumns().addAll(roomTC, checkInTC, checkOutTC, priceTC);
+        mainTableView.getColumns().addAll(roomTC, checkInTC, checkOutTC, priceTC, checkColumn);
     }
 
     public void setTotalCostTF(){
