@@ -372,8 +372,13 @@ public class UserController {
     private boolean addCurrentState() {
         try {
             Statement statement = Model.connection.createStatement();
-            String select = "select id_pokoju from pokoje where typ = '" + selRoomTypeMB.getText()  + "' and id_pokoju not in (select id_pokoju from reserved);";
-            ResultSet rs = statement.executeQuery(select);
+            StringBuilder select = new StringBuilder("select id_pokoju from pokoje where typ = '" + selRoomTypeMB.getText()  + "' and id_pokoju not in (select id_pokoju from reserved)");
+            for(Pair<Reservation, List<Services>> pair : reservations)
+            {
+                select.append(" and id_pokoju <> " + pair.t.idRoom);
+            }
+            select.append(";");
+            ResultSet rs = statement.executeQuery(select.toString());
             rs.next();
             int idRoom = rs.getInt("id_pokoju");
             String selectPrice ="select oblicz_znizke(" + idGast + ", (" + actualPrice +" + cena_podstawowa) * ('" + checkoutTF.getText() + "'::date - '" + checkinTF.getText() + "'::date), '" +checkinTF.getText() + "'::date) as cena from pokoje where id_pokoju = " + idRoom + ";";
