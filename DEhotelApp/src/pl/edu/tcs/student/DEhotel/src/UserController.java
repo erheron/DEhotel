@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -19,7 +20,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
@@ -302,7 +303,7 @@ public class UserController {
         selRoomTypeMB.setText("Select room type");
         checkinTF.setText("");
         checkoutTF.setText("");
-        peopleTextField.setText("1");
+        peopleTextField.setText("");
         calendar.setValue(null);
         checkinDate = null;
         checkoutDate = null;
@@ -378,8 +379,8 @@ public class UserController {
             for(Pair<Reservation, List<Services>> pair : reservations)
             {
                 if((checkinDate.isBefore(LocalDate.parse(pair.t.checkinDate)) && checkinDate.isAfter(LocalDate.parse(pair.t.checkoutDate))) ||
-                (checkoutDate.isAfter(LocalDate.parse(pair.t.checkinDate)) && checkoutDate.isBefore(LocalDate.parse(pair.t.checkoutDate))) ||
-                ((checkinDate.isBefore(LocalDate.parse(pair.t.checkinDate)) || checkinDate.isEqual(LocalDate.parse(pair.t.checkinDate)) ) && (checkoutDate.isAfter(LocalDate.parse(pair.t.checkoutDate)) || checkoutDate.isEqual(LocalDate.parse(pair.t.checkoutDate)) )) )
+                        (checkoutDate.isAfter(LocalDate.parse(pair.t.checkinDate)) && checkoutDate.isBefore(LocalDate.parse(pair.t.checkoutDate))) ||
+                        ((checkinDate.isBefore(LocalDate.parse(pair.t.checkinDate)) || checkinDate.isEqual(LocalDate.parse(pair.t.checkinDate)) ) && (checkoutDate.isAfter(LocalDate.parse(pair.t.checkoutDate)) || checkoutDate.isEqual(LocalDate.parse(pair.t.checkoutDate)) )) )
                     select.append(" and id_pokoju <> " + pair.t.idRoom);
             }
             select.append(" ;");
@@ -405,7 +406,6 @@ public class UserController {
 
     private void showDateChooser() {
         Stage stage = new Stage();
-        stage.setResizable(false);
         stage.setWidth(400);
         stage.setHeight(300);
         String date_from = null;
@@ -484,13 +484,9 @@ public class UserController {
             vbox.setSpacing(5);
             vbox.getChildren().add(table);
             Stage stageVisits = new Stage();
-            stageVisits.setResizable(false);
-            stageVisits.initOwner(this.root.getScene().getWindow());
-            stageVisits.initModality(Modality.WINDOW_MODAL);
             stageVisits.setTitle("My visits and reservations");
             stageVisits.setWidth(vbox.getWidth());
             stageVisits.setScene(new Scene(vbox));
-            stageVisits.setResizable(false);
             stageVisits.show();
 
         }catch (Exception e){
@@ -528,7 +524,6 @@ public class UserController {
                     String selectID = "select id_rez_zbiorczej from rezerwacje_goscie order by 1 desc limit 1;";
                     ResultSet rs = statement.executeQuery(selectID);
                     rs.next();
-                    if (!rs.isBeforeFirst() ) System.err.println("America, fuck yeah!");
                     int mainReserveId = rs.getInt("id_rez_zbiorczej");
                     for (Pair<Reservation, List<Services>> pair : reservations) {
                         //insert into
