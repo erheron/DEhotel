@@ -21,11 +21,13 @@ public class ReserveConfirmationController {
         private String checkIn;
         private String checkOut;
         private int price;
+        private boolean checked;
         ReservationTableView(String room, String in, String out, int price){
             this.room = room;
             checkIn = in;
             checkOut = out;
             this.price = price;
+            checked = true;
         }
 
         public String getRoom() {
@@ -42,6 +44,10 @@ public class ReserveConfirmationController {
 
         public int getPrice(){
             return price;
+        }
+
+        public boolean isChecked() {
+            return checked;
         }
     }
     public void reservationList(List<UserController.Pair<UserController.Reservation, List<UserController.Services>>> list){
@@ -66,9 +72,14 @@ public class ReserveConfirmationController {
                 new PropertyValueFactory<>("checkOut"));
         priceTC.setCellValueFactory(
                 new PropertyValueFactory<>("price"));
-        checkColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
+        checkColumn.setCellFactory(tc -> {
+            CheckBoxTableCell checkBox = new CheckBoxTableCell<>();
+            checkBox.setOnMouseClicked(event -> {
+            });
+            return checkBox;
+        });
         checkColumn.setCellValueFactory(
-                new PropertyValueFactory<>("true"));
+                new PropertyValueFactory<>("checked"));
         mainTableView.setItems(data);
         mainTableView.getColumns().addAll(roomTC, checkInTC, checkOutTC, priceTC, checkColumn);
     }
@@ -80,5 +91,4 @@ public class ReserveConfirmationController {
         }
         totalCostTF.setText(sum.toString());
     }
-
 }
