@@ -335,7 +335,10 @@ public class UserController {
                         "(select id_pokoju from reserved)");
                 for(Pair<Reservation, List<Services>> pair : reservations)
                 {
-                    select.append(" and id_pokoju <> " + pair.t.idRoom);
+                    if((checkinDate.isBefore(LocalDate.parse(pair.t.checkinDate)) && checkinDate.isAfter(LocalDate.parse(pair.t.checkoutDate))) ||
+                            (checkoutDate.isAfter(LocalDate.parse(pair.t.checkinDate)) && checkoutDate.isBefore(LocalDate.parse(pair.t.checkoutDate))) ||
+                            ((checkinDate.isBefore(LocalDate.parse(pair.t.checkinDate)) || checkinDate.isEqual(LocalDate.parse(pair.t.checkinDate)) ) && (checkoutDate.isAfter(LocalDate.parse(pair.t.checkoutDate)) || checkoutDate.isEqual(LocalDate.parse(pair.t.checkoutDate)) )) )
+                        select.append(" and id_pokoju <> " + pair.t.idRoom);
                 }
                 select.append(";");
                 String roomType;
@@ -375,14 +378,16 @@ public class UserController {
             StringBuilder select = new StringBuilder("select id_pokoju from pokoje where typ = '" + selRoomTypeMB.getText()  + "' and id_pokoju not in (select id_pokoju from reserved)");
             for(Pair<Reservation, List<Services>> pair : reservations)
             {
-                select.append(" and id_pokoju <> " + pair.t.idRoom);
+                if((checkinDate.isBefore(LocalDate.parse(pair.t.checkinDate)) && checkinDate.isAfter(LocalDate.parse(pair.t.checkoutDate))) ||
+                (checkoutDate.isAfter(LocalDate.parse(pair.t.checkinDate)) && checkoutDate.isBefore(LocalDate.parse(pair.t.checkoutDate))) ||
+                ((checkinDate.isBefore(LocalDate.parse(pair.t.checkinDate)) || checkinDate.isEqual(LocalDate.parse(pair.t.checkinDate)) ) && (checkoutDate.isAfter(LocalDate.parse(pair.t.checkoutDate)) || checkoutDate.isEqual(LocalDate.parse(pair.t.checkoutDate)) )) )
+                    select.append(" and id_pokoju <> " + pair.t.idRoom);
             }
-            select.append(";");
+            select.append(" ;");
             ResultSet rs = statement.executeQuery(select.toString());
             rs.next();
             int idRoom = rs.getInt("id_pokoju");
             String selectPrice ="select oblicz_znizke(" + idGast + ", (" + actualPrice +" + cena_podstawowa) * ('" + checkoutTF.getText() + "'::date - '" + checkinTF.getText() + "'::date), '" +checkinTF.getText() + "'::date) as cena from pokoje where id_pokoju = " + idRoom + ";";
-            System.out.println(selectPrice);
             ResultSet rs2 = statement.executeQuery(selectPrice);
             rs2.next();
             int price = rs2.getInt("cena");
