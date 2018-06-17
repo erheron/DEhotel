@@ -21,7 +21,7 @@ public class Model extends Application {
     public void start(Stage primaryStage) throws Exception{
         connection();
         //some global settings go
-        primaryStage.setWidth(700);
+        primaryStage.setWidth(750);
         primaryStage.setHeight(800);
         primaryStage.setTitle("DEhotel - from Krakow with love :)");
         //login form goes first

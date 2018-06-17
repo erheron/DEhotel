@@ -15,12 +15,13 @@ def random_with_N_digits(n):
     return randint(range_start, range_end)
 
 #TODO: problem with standard input and connecting
-#dbname = raw_input("Enter current database name: ")
-#user = raw_input("Enter user: ")
-#password = raw_input("Enter user password to connect: ")
+#dbname = input("Enter current database name: ")
+dbname="hotel"
+user = input("Enter user: ")
+password = input("Enter user password to connect: ")
 
 try:
-	conn = psycopg2.connect("dbname = 'hotel' user = 'erheron' password ='erheron'")
+	conn = psycopg2.connect(dbname=dbname, user=user, password=password)
 except:
 	print('Unable to connect')
 

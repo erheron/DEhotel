@@ -12,7 +12,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -21,7 +20,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
@@ -56,6 +54,7 @@ public class UserController {
     /*----------------------1-------------------
      *              general fields used        */
     private ReserveConfirmationController resConfirmController;
+    private ExtraServicesController extraServController;
     private final String pattern = "yyyy-MM-dd";
     private StringBuilder roomType;
     int idGast;
@@ -301,6 +300,21 @@ public class UserController {
     }
     public void extraServicesBaction(ActionEvent actionEvent) {
         try{
+            Stage extraServStage = new Stage();
+            extraServStage.setTitle("Extra services");
+            FXMLLoader extraServLoader = new FXMLLoader(getClass().getResource("extraServicesForm.fxml"));
+            extraServController = extraServLoader.getController();
+            extraServController.initMenuButton(null);//TODO=provide collection for initialization
+            Scene extraServScene = new Scene(extraServController.root);
+            extraServStage.setScene(extraServScene);
+            extraServStage.initOwner(this.root.getScene().getWindow());
+            extraServStage.initModality(Modality.WINDOW_MODAL);
+            extraServStage.setResizable(false);
+            extraServStage.show();
+            //TODO=pobieranie wybranych danych z tego kontrolera
+            //TODO=widze 2 opcje, 1) ustalenie tu (UserController) handlera z dostępem do pół
+            //TODO=2) coś w tym kontrolerże z ew. pobieraniem pól wprost typu ;C.pole'
+
             Statement statement = Model.connection.createStatement();
             String selectServices = "select * from uslugi_dod";
             ResultSet rs = statement.executeQuery(selectServices);
