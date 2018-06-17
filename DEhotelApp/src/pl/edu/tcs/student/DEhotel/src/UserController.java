@@ -1,3 +1,4 @@
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -10,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -18,6 +20,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
@@ -45,6 +48,7 @@ public class UserController {
     @FXML public Button oneMoreResB;
     @FXML public Button extraServicesB;
     @FXML public MenuButton selRoomTypeMB;
+    @FXML public Label howManyPeopleL;
 
     /*----------------------1-------------------
      *              general fields used        */
@@ -284,6 +288,7 @@ public class UserController {
         checkoutTF.setVisible(true);
         peopleTextField.setVisible(true);
         selRoomTypeMB.setVisible(true);
+        howManyPeopleL.setVisible(true);
 
     }
     private void enableRegistration(){
@@ -422,6 +427,7 @@ public class UserController {
         pane.setAlignment(vBox, Pos.CENTER);
         Scene scene = new Scene(pane);
         stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(this.root.getScene().getWindow());
         stage.setScene(scene);
         stage.showAndWait();
 
@@ -433,16 +439,22 @@ public class UserController {
             ResultSet rs = statement.executeQuery(selectVisits);
             TableView table = new TableView();
             TableColumn idResTC = new TableColumn("Id reservation");
+            idResTC.setResizable(true);
+            idResTC.setPrefWidth(150);
             TableColumn fromTC = new TableColumn("Check in");
-            TableColumn toTC = new TableColumn("Chceck out");
+            fromTC.setResizable(true);
+            fromTC.setPrefWidth(140);
+            TableColumn toTC = new TableColumn("Check out");
+            toTC.setPrefWidth(140);
             TableColumn priceTC = new TableColumn("Price");
+            priceTC.setPrefWidth(100);
+            TableColumn checkColumn = new TableColumn("Checked");
 
             ObservableList<ReserveConfirmationController.ReservationTableView> data =
                     FXCollections.observableArrayList();
             while (rs.next()) {
                 data.add(new ReserveConfirmationController.ReservationTableView(rs.getString("id_rez_zbiorczej"), rs.getString("data_od"), rs.getString("data_do"), rs.getInt("cena")));
             }
-
             idResTC.setCellValueFactory(
                     new PropertyValueFactory<>("room"));
             fromTC.setCellValueFactory(
@@ -452,14 +464,18 @@ public class UserController {
             priceTC.setCellValueFactory(
                     new PropertyValueFactory<>("price"));
 
+            checkColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
+
+
             table.setItems(data);
-            table.getColumns().addAll(idResTC, fromTC, toTC, priceTC);
+            table.getColumns().addAll(idResTC, fromTC, toTC, priceTC,checkColumn);
 
             VBox vbox = new VBox();
             vbox.setSpacing(5);
-            vbox.getChildren().add( table);
+            vbox.getChildren().add(table);
             Stage stageVisits = new Stage();
             stageVisits.setTitle("My visits and reservations");
+            stageVisits.setWidth(vbox.getWidth());
             stageVisits.setScene(new Scene(vbox));
             stageVisits.show();
 
@@ -476,6 +492,7 @@ public class UserController {
         try {
             Stage confirmStage = new Stage();
             confirmStage.initModality(Modality.WINDOW_MODAL);
+            confirmStage.initOwner(this.root.getScene().getWindow());
             confirmStage.setTitle("Please, confirm all your reservations");
             FXMLLoader resLoader = new FXMLLoader(getClass().getResource("reserveConfirmationForm.fxml"));
             AnchorPane resConfirmRoot = resLoader.load();
