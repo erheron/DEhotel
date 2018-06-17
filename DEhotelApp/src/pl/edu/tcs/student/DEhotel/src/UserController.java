@@ -516,6 +516,9 @@ public class UserController {
                 confirmStage.close();
 
             });
+
+
+
             resConfirmController.confirmB.setOnAction(e -> {
                 try{
                     Statement statement = Model.connection.createStatement();
@@ -524,7 +527,8 @@ public class UserController {
                     String selectID = "select id_rez_zbiorczej from rezerwacje_goscie order by 1 desc limit 1;";
                     ResultSet rs = statement.executeQuery(selectID);
                     rs.next();
-                    int mainReserveId = rs.getInt("id_rez_zbiorczej");
+                    StringBuilder stringBuilder = new StringBuilder();
+                    Integer mainReserveId = rs.getInt("id_rez_zbiorczej");
                     for (Pair<Reservation, List<Services>> pair : reservations) {
                         //insert into
                         String insert = "insert into rezerwacje_pokoje values (" + mainReserveId + ", default, " + pair.t.idRoom + ", '" + pair.t.checkinDate + "'::date, '" + pair.t.checkoutDate + "'::date, " + pair.t.price + ", 'G', " + pair.t.amountOfPeople + ", default);";
@@ -534,9 +538,13 @@ public class UserController {
                         ResultSet rs3 = statement.executeQuery(selectIdOne);
                         rs3.next();
                         changeConfirmationStatus(ConfirmationStatus.Default);
+                        stringBuilder.append(mainReserveId.toString() + "/" + rs3.getInt("id_rez_pojedynczej")+"\n");
                     }
-                   /*String dropOccupied = "drop view if exists Occupied;";
-                    statement.executeUpdate(dropOccupied);*/
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Reservation confirmed");
+                    alert.setHeaderText("Your reservation keys: ");
+                    alert.setContentText(stringBuilder.toString());
+                    alert.showAndWait();
                     reservations.clear();
                 }catch (Exception e2){
                     System.out.println(e2.getMessage());
