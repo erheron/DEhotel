@@ -80,21 +80,15 @@ public class ReserveConfirmationController {
                 new PropertyValueFactory<>("price"));
         checkColumn.setCellFactory(tc -> {
             CheckBoxTableCell<ReservationTableView, Boolean> checkBox = new CheckBoxTableCell<>();
-            checkBox.setOnMouseClicked(event -> {
-                System.out.println("you suuuuuuck");
-            });
             checkBox.setFocusTraversable(false);
             checkBox.setEditable(true);
             checkBox.setSelectedStateCallback(index -> {
                 ReservationTableView r = mainTableView.getItems().get(index);
                 return r.checked;
             });
-
             return checkBox;
         });
 
-//        checkColumn.setCellValueFactory(
-//                new PropertyValueFactory<>("checked"));
         mainTableView.setItems(data);
         mainTableView.getColumns().addAll(roomTC, checkInTC, checkOutTC, priceTC, checkColumn);
     }

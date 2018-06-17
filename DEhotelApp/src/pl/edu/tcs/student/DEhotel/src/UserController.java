@@ -19,6 +19,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
@@ -404,6 +405,7 @@ public class UserController {
 
     private void showDateChooser() {
         Stage stage = new Stage();
+        stage.setResizable(false);
         stage.setWidth(400);
         stage.setHeight(300);
         String date_from = null;
@@ -482,6 +484,9 @@ public class UserController {
             vbox.setSpacing(5);
             vbox.getChildren().add(table);
             Stage stageVisits = new Stage();
+            stageVisits.setResizable(false);
+            stageVisits.initOwner(this.root.getScene().getWindow());
+            stageVisits.initModality(Modality.WINDOW_MODAL);
             stageVisits.setTitle("My visits and reservations");
             stageVisits.setWidth(vbox.getWidth());
             stageVisits.setScene(new Scene(vbox));
@@ -523,7 +528,7 @@ public class UserController {
                     String selectID = "select id_rez_zbiorczej from rezerwacje_goscie order by 1 desc limit 1;";
                     ResultSet rs = statement.executeQuery(selectID);
                     rs.next();
-                    if (!rs.isBeforeFirst() ) System.err.println("you suck");
+                    if (!rs.isBeforeFirst() ) System.err.println("America, fuck yeah!");
                     int mainReserveId = rs.getInt("id_rez_zbiorczej");
                     for (Pair<Reservation, List<Services>> pair : reservations) {
                         //insert into
