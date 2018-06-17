@@ -1,33 +1,37 @@
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
 
+import java.io.FilterInputStream;
 import java.util.List;
 
 public class ReserveConfirmationController {
     @FXML public Button confirmB;
     @FXML public Button backB;
     @FXML public TextField totalCostTF;
-    @FXML public TableView mainTableView;
+    @FXML public TableView<ReservationTableView> mainTableView;
     private List<UserController.Pair<UserController.Reservation, List<UserController.Services>>> list;
+
+
     public static class ReservationTableView{
         private String room;
         private String checkIn;
         private String checkOut;
         private int price;
-        private boolean checked;
+        public SimpleBooleanProperty checked;
         ReservationTableView(String room, String in, String out, int price){
             this.room = room;
             checkIn = in;
             checkOut = out;
             this.price = price;
-            checked = true;
+            checked = new SimpleBooleanProperty(true);
         }
 
         public String getRoom() {
@@ -46,7 +50,7 @@ public class ReserveConfirmationController {
             return price;
         }
 
-        public boolean isChecked() {
+        public SimpleBooleanProperty isChecked() {
             return checked;
         }
     }
@@ -54,11 +58,13 @@ public class ReserveConfirmationController {
         this.list = list;
     }
     public void setMainTableView() {
+        //mainTableView.getSelectionModel().setCellSelectionEnabled(true);
+        mainTableView.setEditable(true);
         TableColumn roomTC = new TableColumn("Room type");
         TableColumn checkInTC = new TableColumn("Check in");
         TableColumn checkOutTC = new TableColumn("Check out");
         TableColumn priceTC = new TableColumn("Price");
-        TableColumn checkColumn = new TableColumn("Checked");
+        TableColumn<ReservationTableView, Boolean> checkColumn = new TableColumn<>("Checked");
         ObservableList<ReservationTableView> data =
                 FXCollections.observableArrayList();
         for(UserController.Pair<UserController.Reservation, List<UserController.Services>> pair : list){
@@ -73,13 +79,22 @@ public class ReserveConfirmationController {
         priceTC.setCellValueFactory(
                 new PropertyValueFactory<>("price"));
         checkColumn.setCellFactory(tc -> {
-            CheckBoxTableCell checkBox = new CheckBoxTableCell<>();
+            CheckBoxTableCell<ReservationTableView, Boolean> checkBox = new CheckBoxTableCell<>();
             checkBox.setOnMouseClicked(event -> {
+                System.out.println("you suuuuuuck");
             });
+            checkBox.setFocusTraversable(false);
+            checkBox.setEditable(true);
+            checkBox.setSelectedStateCallback(index -> {
+                ReservationTableView r = mainTableView.getItems().get(index);
+                return r.checked;
+            });
+
             return checkBox;
         });
-        checkColumn.setCellValueFactory(
-                new PropertyValueFactory<>("checked"));
+
+//        checkColumn.setCellValueFactory(
+//                new PropertyValueFactory<>("checked"));
         mainTableView.setItems(data);
         mainTableView.getColumns().addAll(roomTC, checkInTC, checkOutTC, priceTC, checkColumn);
     }
