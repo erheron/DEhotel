@@ -299,10 +299,14 @@ public class UserController {
 
     private void bringToInitialState(){
         calendarLabel.setText("Select check-in date");
+        selRoomTypeMB.getItems().removeIf(e -> true);
+        selRoomTypeMB.setText("Select room type");
         checkinTF.setText("");
         checkoutTF.setText("");
         peopleTextField.setText("");
         calendar.setValue(null);
+        checkinDate = null;
+        checkoutDate = null;
     }
 
 
@@ -448,7 +452,6 @@ public class UserController {
             toTC.setPrefWidth(140);
             TableColumn priceTC = new TableColumn("Price");
             priceTC.setPrefWidth(100);
-            TableColumn checkColumn = new TableColumn("Checked");
 
             ObservableList<ReserveConfirmationController.ReservationTableView> data =
                     FXCollections.observableArrayList();
@@ -464,11 +467,8 @@ public class UserController {
             priceTC.setCellValueFactory(
                     new PropertyValueFactory<>("price"));
 
-            checkColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
-
-
             table.setItems(data);
-            table.getColumns().addAll(idResTC, fromTC, toTC, priceTC,checkColumn);
+            table.getColumns().addAll(idResTC, fromTC, toTC, priceTC);
 
             VBox vbox = new VBox();
             vbox.setSpacing(5);
