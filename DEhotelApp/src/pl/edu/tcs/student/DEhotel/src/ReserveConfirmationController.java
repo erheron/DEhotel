@@ -19,6 +19,8 @@ public class ReserveConfirmationController {
     @FXML public TableView<ReservationTableView> mainTableView;
     private List<UserController.Pair<UserController.Reservation, List<UserController.Services>>> list;
 
+    ObservableList<ReservationTableView> data =
+            FXCollections.observableArrayList();
 
     public static class ReservationTableView{
         private String room;
@@ -65,8 +67,6 @@ public class ReserveConfirmationController {
         TableColumn checkOutTC = new TableColumn("Check out");
         TableColumn priceTC = new TableColumn("Price");
         TableColumn<ReservationTableView, Boolean> checkColumn = new TableColumn<>("Checked");
-        ObservableList<ReservationTableView> data =
-                FXCollections.observableArrayList();
         for(UserController.Pair<UserController.Reservation, List<UserController.Services>> pair : list){
             data.add(new ReservationTableView(pair.t.roomType, pair.t.checkinDate, pair.t.checkoutDate, pair.t.price));
         }
