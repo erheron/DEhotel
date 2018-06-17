@@ -183,6 +183,13 @@ public class UserController {
     }
 
     public void reserveButtonOnAction(ActionEvent actionEvent) {
+        //  String createView = "create or replace view Occupied as select data_od, data_do, id_pokoju from pokoje natural join rezerwacje_pokoje where false"; // create empty view
+        try {
+            Statement statement = Model.connection.createStatement();
+            //    statement.executeUpdate(createView);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         setAllVisible();
     }
 
@@ -208,7 +215,7 @@ public class UserController {
 
     private void checkOtherMyReservations(){
         if(reservations.isEmpty())
-                return;
+            return;
 
     }
 
@@ -228,9 +235,9 @@ public class UserController {
         addCurrentState();
         showTotalConfirmation();//confirmation status is updated here
         if(confirmationStatus == ConfirmationStatus.Back) {
-            return;//TODO=client want back, sooooo...? what to do?
+            return;
         }
-       bringToInitialState();
+        bringToInitialState();
     }
 
     public void oneMoreResBaction(ActionEvent actionEvent) {
@@ -242,7 +249,7 @@ public class UserController {
             Statement statement = Model.connection.createStatement();
             String selectServices = "select * from uslugi_dod";
             ResultSet rs = statement.executeQuery(selectServices);
-           // ArrayList<Integer> id = new ArrayList<>(); //id_uslugi
+            // ArrayList<Integer> id = new ArrayList<>(); //id_uslugi
             ArrayList<String> names = new ArrayList<>(); //nazwa
             ArrayList<Integer> prices = new ArrayList<>(); //ceny
             while(rs.next()){
@@ -306,19 +313,24 @@ public class UserController {
                 else
                     peopleAmount = Integer.parseInt(peopleTextField.getText());
                 String createView = "create or replace view reserved as " +
-                                        "select typ, id_pokoju " +
-                                        "from pokoje natural join rezerwacje_pokoje "+
-                                        "where max_liczba_osob >= " +peopleAmount +
-                                        " and (('" + checkinTF.getText() + "'::date < data_od and data_od < '" + checkoutTF.getText() + "'::date) or "+
-                                        " ('"+checkinTF.getText() +"'::date < data_do and data_do < '" + checkoutTF.getText() + "'::date) or " +
-                                        " (data_od <= '" + checkinTF.getText() + "'::date and '" + checkoutTF.getText() + "'::date <= data_do )) and anulowane_data is null;";
+                        "select typ, id_pokoju " +
+                        "from pokoje natural join rezerwacje_pokoje "+
+                        "where max_liczba_osob >= " +peopleAmount +
+                        " and (('" + checkinTF.getText() + "'::date < data_od and data_od < '" + checkoutTF.getText() + "'::date) or "+
+                        " ('"+checkinTF.getText() +"'::date < data_do and data_do < '" + checkoutTF.getText() + "'::date) or " +
+                        " (data_od <= '" + checkinTF.getText() + "'::date and '" + checkoutTF.getText() + "'::date <= data_do )) and anulowane_data is null;";
                 stmt.executeUpdate(createView);
-                String select = "select distinct typ" +
-                                " from pokoje "+
-                                " where max_liczba_osob >= " +peopleAmount + " and id_pokoju not in " +
-                                "(select id_pokoju from reserved);";
+                StringBuilder select = new StringBuilder("select distinct typ" +
+                        " from pokoje "+
+                        " where max_liczba_osob >= " +peopleAmount + " and id_pokoju not in " +
+                        "(select id_pokoju from reserved)");
+                for(Pair<Reservation, List<Services>> pair : reservations)
+                {
+                    select.append(" and id_pokoju <> " + pair.t.idRoom);
+                }
+                select.append(";");
                 String roomType;
-                ResultSet rs = stmt.executeQuery(select);
+                ResultSet rs = stmt.executeQuery(select.toString());
                 while(rs.next()){
                     roomType = rs.getString("typ") ;
                     MenuItem nextMI = new MenuItem();
@@ -355,7 +367,8 @@ public class UserController {
             ResultSet rs = statement.executeQuery(select);
             rs.next();
             int idRoom = rs.getInt("id_pokoju");
-            String selectPrice ="select oblicz_znizke(" + idGast + ", (" + actualPrice +"cena_podstawowa) * ('" + checkoutTF.getText() + "'::date - '" + checkinTF.getText() + "'::date)) as cena from pokoje where id_pokoju = " + idRoom + ";";
+            String selectPrice ="select oblicz_znizke(" + idGast + ", (" + actualPrice +" + cena_podstawowa) * ('" + checkoutTF.getText() + "'::date - '" + checkinTF.getText() + "'::date), '" +checkinTF.getText() + "'::date) as cena from pokoje where id_pokoju = " + idRoom + ";";
+            System.out.println(selectPrice);
             ResultSet rs2 = statement.executeQuery(selectPrice);
             rs2.next();
             int price = rs2.getInt("cena");
@@ -363,6 +376,8 @@ public class UserController {
             reservations.add(new Pair<Reservation, List<Services>>(reservation, new ArrayList<>()));
             String drop = "drop view if exists reserved";
             statement.executeUpdate(drop);
+            // String updateOccupied = "update Occupied set (data_od, data_do, id_pokoju) = ('" + checkinTF.getText()+ "'::date, '" + checkoutTF.getText() + "'::date, "+ idRoom+");";
+            // statement.executeUpdate(updateOccupied);
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -398,7 +413,7 @@ public class UserController {
             else {
                 addTableView(dfrom.getText(), dto.getText());
             }
-           // stage.close();
+            // stage.close();
         });
         dfrom.setPromptText("Insert date from, format YYYY-MM-DD");
         dto.setPromptText("Insert date to, format YYYY-MM-DD");
@@ -413,7 +428,7 @@ public class UserController {
     }
     void  addTableView(String dFrom, String dTO){
         try {
-            String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date ;";
+            String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date and anulowane_data is null;";
             Statement statement = Model.connection.createStatement();
             ResultSet rs = statement.executeQuery(selectVisits);
             TableView table = new TableView();
@@ -471,6 +486,7 @@ public class UserController {
             Scene resConfirmScene = new Scene(resConfirmRoot);
             confirmStage.setScene(resConfirmScene);
             resConfirmController.backB.setOnAction(e -> {
+                confirmStage.close();
 
             });
             resConfirmController.confirmB.setOnAction(e -> {
@@ -492,13 +508,15 @@ public class UserController {
                         rs3.next();
                         changeConfirmationStatus(ConfirmationStatus.Default);
                     }
+                   /*String dropOccupied = "drop view if exists Occupied;";
+                    statement.executeUpdate(dropOccupied);*/
                     reservations.clear();
                 }catch (Exception e2){
                     System.out.println(e2.getMessage());
                 }
                 confirmStage.close();
                 changeConfirmationStatus(ConfirmationStatus.Back);
-               confirmStage.close();
+                confirmStage.close();
             });
             confirmStage.show();
         }catch(IOException e){
