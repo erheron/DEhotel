@@ -183,6 +183,13 @@ public class UserController {
     }
 
     public void reserveButtonOnAction(ActionEvent actionEvent) {
+        String createView = "create or replace view Occupied as select data_od, data_do, id_pokoju from pokoje natural join rezerwacje_pokoje limit 0"; // create empty view
+        try {
+            Statement statement = Model.connection.createStatement();
+            statement.executeUpdate(createView);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         setAllVisible();
     }
 
@@ -355,7 +362,7 @@ public class UserController {
             ResultSet rs = statement.executeQuery(select);
             rs.next();
             int idRoom = rs.getInt("id_pokoju");
-            String selectPrice ="select oblicz_znizke(" + idGast + ", (" + actualPrice +"cena_podstawowa) * ('" + checkoutTF.getText() + "'::date - '" + checkinTF.getText() + "'::date)) as cena from pokoje where id_pokoju = " + idRoom + ";";
+            String selectPrice ="select oblicz_znizke(" + idGast + ", (" + actualPrice +" + cena_podstawowa) * ('" + checkoutTF.getText() + "'::date - '" + checkinTF.getText() + "'::date)) as cena from pokoje where id_pokoju = " + idRoom + ";";
             ResultSet rs2 = statement.executeQuery(selectPrice);
             rs2.next();
             int price = rs2.getInt("cena");
@@ -363,6 +370,7 @@ public class UserController {
             reservations.add(new Pair<Reservation, List<Services>>(reservation, new ArrayList<>()));
             String drop = "drop view if exists reserved";
             statement.executeUpdate(drop);
+            String updateOccupied = "update Occupied set (data_od, data_do, id_pokoju) = (" + checkinTF.getText()+ ", " + checkoutTF.getText() + ", "+ idRoom+");";
             return true;
         }catch (Exception e){
             e.printStackTrace();
