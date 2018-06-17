@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -20,7 +19,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
@@ -303,7 +301,7 @@ public class UserController {
         selRoomTypeMB.setText("Select room type");
         checkinTF.setText("");
         checkoutTF.setText("");
-        peopleTextField.setText("");
+        peopleTextField.setText("1");
         calendar.setValue(null);
         checkinDate = null;
         checkoutDate = null;
@@ -487,6 +485,7 @@ public class UserController {
             stageVisits.setTitle("My visits and reservations");
             stageVisits.setWidth(vbox.getWidth());
             stageVisits.setScene(new Scene(vbox));
+            stageVisits.setResizable(false);
             stageVisits.show();
 
         }catch (Exception e){
@@ -524,6 +523,7 @@ public class UserController {
                     String selectID = "select id_rez_zbiorczej from rezerwacje_goscie order by 1 desc limit 1;";
                     ResultSet rs = statement.executeQuery(selectID);
                     rs.next();
+                    if (!rs.isBeforeFirst() ) System.err.println("you suck");
                     int mainReserveId = rs.getInt("id_rez_zbiorczej");
                     for (Pair<Reservation, List<Services>> pair : reservations) {
                         //insert into
