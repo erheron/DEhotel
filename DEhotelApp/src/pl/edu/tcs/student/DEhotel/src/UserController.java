@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.*;
 
 public class UserController {
@@ -49,6 +50,7 @@ public class UserController {
     @FXML public Button extraServicesB;
     @FXML public MenuButton selRoomTypeMB;
     @FXML public Label howManyPeopleL;
+    @FXML public Button cancelReservationB;
 
     /*----------------------1-------------------
      *              general fields used        */
@@ -57,6 +59,8 @@ public class UserController {
     private StringBuilder roomType;
     int idGast;
     private int actualPrice;
+
+
 
 
     //field for confirmation from pressing 'reserve all'
@@ -205,6 +209,18 @@ public class UserController {
             e.printStackTrace();
             System.err.println(e.getMessage());
         }
+    }
+
+    public void cancelReservationBaction(ActionEvent actionEvent) {
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Cancel reservation");
+        dialog.setHeaderText("Please, select id of reservation in 'A/B' format");
+        dialog.initOwner(this.root.getScene().getWindow());
+        dialog.initModality(Modality.WINDOW_MODAL);
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(number -> {
+            //TODO=parse number from A/B to int1, int2
+        });
     }
 
     /*----------------end of block------------------
@@ -379,8 +395,8 @@ public class UserController {
             for(Pair<Reservation, List<Services>> pair : reservations)
             {
                 if((checkinDate.isBefore(LocalDate.parse(pair.t.checkinDate)) && checkinDate.isAfter(LocalDate.parse(pair.t.checkoutDate))) ||
-                (checkoutDate.isAfter(LocalDate.parse(pair.t.checkinDate)) && checkoutDate.isBefore(LocalDate.parse(pair.t.checkoutDate))) ||
-                ((checkinDate.isBefore(LocalDate.parse(pair.t.checkinDate)) || checkinDate.isEqual(LocalDate.parse(pair.t.checkinDate)) ) && (checkoutDate.isAfter(LocalDate.parse(pair.t.checkoutDate)) || checkoutDate.isEqual(LocalDate.parse(pair.t.checkoutDate)) )) )
+                        (checkoutDate.isAfter(LocalDate.parse(pair.t.checkinDate)) && checkoutDate.isBefore(LocalDate.parse(pair.t.checkoutDate))) ||
+                        ((checkinDate.isBefore(LocalDate.parse(pair.t.checkinDate)) || checkinDate.isEqual(LocalDate.parse(pair.t.checkinDate)) ) && (checkoutDate.isAfter(LocalDate.parse(pair.t.checkoutDate)) || checkoutDate.isEqual(LocalDate.parse(pair.t.checkoutDate)) )) )
                     select.append(" and id_pokoju <> " + pair.t.idRoom);
             }
             select.append(" ;");
@@ -516,6 +532,9 @@ public class UserController {
                 confirmStage.close();
 
             });
+
+
+
             resConfirmController.confirmB.setOnAction(e -> {
                 try{
                     Statement statement = Model.connection.createStatement();

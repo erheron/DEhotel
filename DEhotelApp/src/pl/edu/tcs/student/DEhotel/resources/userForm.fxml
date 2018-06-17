@@ -16,16 +16,21 @@
     <children>
         <BorderPane layoutY="-2.0" prefHeight="709.0" prefWidth="740.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <left>
-                <VBox prefHeight="598.0" prefWidth="155.0" spacing="10.0" BorderPane.alignment="CENTER">
+                <VBox prefHeight="598.0" prefWidth="186.0" spacing="10.0" BorderPane.alignment="CENTER">
                     <children>
-                        <Button fx:id="reserveButton" mnemonicParsing="false" onAction="#reserveButtonOnAction" prefHeight="26.0" prefWidth="105.0" text="Reservation">
+                        <Button fx:id="reserveButton" mnemonicParsing="false" onAction="#reserveButtonOnAction" prefHeight="26.0" prefWidth="197.0" text="Reservation">
                      <font>
                         <Font name="DejaVu Sans Bold" size="12.0" />
                      </font></Button>
-                        <Button fx:id="seeMyVisitsButton" mnemonicParsing="false" onAction="#seeMyVisitsButtonOnAction" prefHeight="26.0" prefWidth="105.0" text="See my visits">
+                        <Button fx:id="seeMyVisitsButton" mnemonicParsing="false" onAction="#seeMyVisitsButtonOnAction" prefHeight="26.0" prefWidth="189.0" text="See my visits">
                      <font>
-                        <Font name="DejaVu Sans Bold" size="11.0" />
+                        <Font name="DejaVu Sans Bold" size="12.0" />
                      </font></Button>
+                  <Button fx:id="cancelReservationB" mnemonicParsing="false" onAction="#cancelReservationBaction" prefHeight="26.0" prefWidth="175.0" text="Cancel reservation">
+                     <font>
+                        <Font name="DejaVu Sans Bold" size="12.0" />
+                     </font>
+                  </Button>
                     </children>
                     <padding>
                         <Insets left="15.0" right="15.0" />
