@@ -11,10 +11,6 @@
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ReserveConfirmationController">
    <children>
       <TableView fx:id="mainTableView" layoutX="5.0" layoutY="32.0" prefHeight="247.0" prefWidth="600.0" AnchorPane.bottomAnchor="121.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="32.0">
-        <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
-        </columns>
       </TableView>
       <Label alignment="CENTER" contentDisplay="CENTER" layoutX="137.0" layoutY="8.0" prefHeight="16.0" prefWidth="322.0" text="You have reserved following rooms!" textAlignment="CENTER">
          <font>

@@ -25,4 +25,4 @@ in folder ```out/artifacts/DEhotelApp_jar```
 
 #Authors
 * **Władysław Raczek**
-* **Katarżyna Król**
+* **Katarzyna Król**
