@@ -129,6 +129,8 @@ class maker:
 
 		cur.execute(self.sql_insert.format('rodzaje_wyposazenia', columns = 'nazwa, cena_przedmiotu, liczba_przedmiotow', val="\'Lampa IKEA HEKTAR\', 109.00, 73"))
 		cur.execute(self.sql_insert.format('rodzaje_wyposazenia', columns = 'nazwa, cena_przedmiotu, liczba_przedmiotow', val="\'Lampa IKEA ARSTID\', 209.00, 12"))
+		cur.execute(self.sql_insert.format('rodzaje_wyposazenia', columns = 'nazwa, cena_przedmiotu, liczba_przedmiotow', val="\'Lampa podlogowa IKEA ARSTID\', 149.00, 12"))
+
 
 		cur.execute(self.sql_insert.format('rodzaje_wyposazenia', columns = 'nazwa, cena_przedmiotu, liczba_przedmiotow', val="\'Sofa IKEA ANGSTA\', 899.00, 12"))
 
@@ -150,11 +152,19 @@ class maker:
 		cur.execute(self.sql_insert.format('rodzaje_wyposazenia', columns = 'nazwa, cena_przedmiotu, liczba_przedmiotow', val="\'Szafa IKEA PAX 3m\', 2155.00, 2"))
 #to triple standard and 2/1deluxe, and triple superior
 		cur.execute(self.sql_insert.format('rodzaje_wyposazenia', columns = 'nazwa, cena_przedmiotu, liczba_przedmiotow', val="\'Szafa IKEA PAX 2.5m\', 1370.00, 21"))
+		cur.execute(self.sql_insert.format('rodzaje_wyposazenia', columns = 'nazwa, cena_przedmiotu, liczba_przedmiotow', val="\'Sofa IKEA VILASUND\', 2499.00, 3"))
+
+		cur.execute(self.sql_insert.format('rodzaje_wyposazenia', columns = 'nazwa, cena_przedmiotu, liczba_przedmiotow', val="\'Przescieradlo IKEA ULLVIDE\', 59.00, 73"))
+		cur.execute(self.sql_insert.format('rodzaje_wyposazenia', columns = 'nazwa, cena_przedmiotu, liczba_przedmiotow', val="\'Przescieradlo IKEA SOMNTUTA\', 90.00, 28"))
+		cur.execute(self.sql_insert.format('rodzaje_wyposazenia', columns = 'nazwa, cena_przedmiotu, liczba_przedmiotow', val="\'Przescieradlo IKEA NATTJASMIN\', 129.00, 12"))
+
 		conn.commit()
 		
 	def fill_given_room_equipment(self, room_type, equipment_names_count, amount_of_people):
-		cur.execute("SELECT id_pokoju FROM pokoje WHERE typ like %s AND max_liczba_osob = %s;", (room_type, amount_of_people,))
+		cur.execute("SELECT id_pokoju FROM pokoje WHERE typ like %s AND max_liczba_osob = %s;", (room_type, amount_of_people))
 		rooms=cur.fetchall()
+		print(rooms)
+		print('_____________________________________')
 		rlen=len(rooms)
 		#for every room which matched to our criteria do the following:
 		#go through list ob objects, and (depending on value of 'cnt') insert as much info into 'wyposazenie' as we need
@@ -164,6 +174,7 @@ class maker:
 		maxid=maxid[0][0]	
 		for roomset in rooms:
 			room=roomset[0]
+			print('room=' + str(room) + '  ')
 			for eq in equipment_names_count:#list of pairs
 				cnt=eq[1]
 				eqname=eq[0]
@@ -186,44 +197,51 @@ class maker:
 	
 	def fill_superior_rooms(self):
 		eq_names=[['Krzeslo IKEA INGOLF', 1], ['Lampa IKEA HEKTAR', 1], ['Lampa biurkowa IKEA FORSA', 1], ['Stol IKEA INGO', 1]]
-		self.fill_given_room_equipment('%superior', eq_names, 1)
+		self.fill_given_room_equipment("%superior", eq_names, 1)
 		eq_names=[['Krzeslo IKEA INGOLF', 2], ['Lampa IKEA HEKTAR', 1], ['Lampa biurkowa IKEA FORSA', 1], ['Stol IKEA INGO', 1]]
-		self.fill_given_room_equipment('%superior', eq_names, 2)
+		self.fill_given_room_equipment("%superior", eq_names, 2)
 		eq_names=[['Krzeslo IKEA INGOLF', 3], ['Lampa IKEA HEKTAR', 1], ['Lampa biurkowa IKEA FORSA', 1], ['Stol IKEA INGO', 1]]
-		self.fill_given_room_equipment('%superior', eq_names, 3)
+		self.fill_given_room_equipment("%superior", eq_names, 3)
 			
 	def fill_deluxe_rooms(self):
 		eq_names=[['Krzeslo IKEA INGOLF', 1], ['Fotel IKEA STRADMON', 1], ['Lampa IKEA ARSTID', 1], ['Lampa biurkowa IKEA HEKTAR', 1], 
-		['Stol IKEA BJURSTA', 1]]
-		self.fill_given_room_equipment('%deluxe', eq_names, 1)
+		['Stol IKEA BJURSTA', 1],['Lampa podlogowa IKEA ARSTID', 1] ]
+		self.fill_given_room_equipment("%deluxe", eq_names, 1)
 		eq_names=[['Krzeslo IKEA INGOLF', 2], ['Fotel IKEA STRADMON', 2], ['Lampa IKEA ARSTID', 1], ['Lampa biurkowa IKEA HEKTAR', 1], 
-		['Stol IKEA BJURSTA', 1]]
-		self.fill_given_room_equipment('%deluxe', eq_names, 2)
+		['Stol IKEA BJURSTA', 1],['Lampa podlogowa IKEA ARSTID', 1]]
+		self.fill_given_room_equipment("%deluxe", eq_names, 2)
 		eq_names=[['Krzeslo IKEA INGOLF', 3], ['Fotel IKEA STRADMON', 3], ['Lampa IKEA ARSTID', 1], ['Lampa biurkowa IKEA HEKTAR', 1], 
-		['Stol IKEA BJURSTA', 1]]
-		self.fill_given_room_equipment('%deluxe', eq_names, 3)
+		['Stol IKEA BJURSTA', 1], ['Sofa IKEA VILASUND', 1],['Lampa podlogowa IKEA ARSTID', 1]]
+		self.fill_given_room_equipment("%deluxe", eq_names, 3)
 
 	def fill_bed_all_rooms(self):
-		eq_names=[['Lozko IKEA UTAKER', 1]]
-		self.fill_given_room_equipment('%standard', eq_names, 1)
+		eq_names=[['Lozko IKEA UTAKER', 1], ['Przescieradlo IKEA ULLVIDE', 1]]
+		self.fill_given_room_equipment("%standard", eq_names, 1)
 		eq_names[0][1]=2
-		self.fill_given_room_equipment('%standard', eq_names, 2)
+		eq_names[1][1]=2
+		self.fill_given_room_equipment("twin standard", eq_names, 2)
 		eq_names[0][1]=3
-		self.fill_given_room_equipment('twin %standard', eq_names, 3)
-		eq_names=[['Lozko IKEA OTEREN', 1]]
-		self.fill_given_room_equipment('%superior', eq_names, 1)
+		eq_names[1][1]=3
+		self.fill_given_room_equipment("%standard", eq_names, 3)
+		eq_names=[['Lozko IKEA OTEREN', 1], ['Przescieradlo IKEA SOMNTUTA', 1]]
+		self.fill_given_room_equipment("%superior", eq_names, 1)
 		eq_names[0][1]=2
-		self.fill_given_room_equipment('twin %superior', eq_names, 2)
-		eq_names=[['Lozko IKEA MALM', 1]]
+		eq_names[1][1]=2
+		self.fill_given_room_equipment("twin superior", eq_names, 2)
+		eq_names=[['Lozko IKEA MALM', 1], ['Przescieradlo IKEA NATTJASMIN', 1]]
 		self.fill_given_room_equipment('%deluxe', eq_names, 1)
 		eq_names[0][1]=2
-		self.fill_given_room_equipment('twin %deluxe', eq_names, 2)
-		eq_names=[['Lozko podw. IKEA LAUVIK', 1]]
-		self.fill_given_room_equipment('double %standard', eq_names, 2)
-		eq_names=[['Lozko podw. IKEA GVARV', 1]]
-		self.fill_given_room_equipment('double %superior', eq_names, 2)
-		eq_names=[['Lozko podw. IKEA DUNVIK', 1]]
-		self.fill_given_room_equipment('double %deluxe', eq_names, 2)
+		eq_names[1][1]=2
+		self.fill_given_room_equipment('twin deluxe', eq_names, 2)
+		eq_names[0][1]=3
+		eq_names[1][1]=3
+		self.fill_given_room_equipment('%deluxe', eq_names, 3)
+		eq_names=[['Lozko podw. IKEA LAUVIK', 1], ['Przescieradlo IKEA ULLVIDE', 1]]
+		self.fill_given_room_equipment('double standard', eq_names, 2)
+		eq_names=[['Lozko podw. IKEA GVARV', 1], ['Przescieradlo IKEA SOMNTUTA', 1]]
+		self.fill_given_room_equipment('double superior', eq_names, 2)
+		eq_names=[['Lozko podw. IKEA DUNVIK', 1], ['Przescieradlo IKEA NATTJASMIN', 1]]
+		self.fill_given_room_equipment('double deluxe', eq_names, 2)
 
 
 	def fill_equipment_join_with_rooms(self):
@@ -231,6 +249,18 @@ class maker:
 		self.fill_superior_rooms()
 		self.fill_deluxe_rooms()
 		self.fill_bed_all_rooms()
+	def add_some_random_reservations(self):
+		random.seed(a=None, version=2)
+		for i in range(100):
+			guest=random.randint(1, 200)
+			cur.execute('INSERT INTO rezerwacje_goscie(id_goscia) VALUES (%s);', (guest, ))
+			cur.execute('SELECT MAX(id_rez_zbiorczej) FROM rezerwacje_goscie;')
+			rows = cur.fetchall()
+			res_id = rows[0][0]
+
+			room_id=random.randint(1,10)
+			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, plan_liczba_osob) VALUES (%s, %s, %s, %s, %s);',
+			(res_id, room_id, ))
 
 
 #filling tables
@@ -250,4 +280,5 @@ mainMaker.insert_equipment_categories_static()
 
 #attempting to fill both 'wyposazenie' and 'pokoje_wyposazenie'
 mainMaker.fill_equipment_join_with_rooms()
+
 

@@ -15,7 +15,6 @@ public class AdminController {
     @FXML public Button submitButton;
     @FXML public MenuButton selectMenu;
     @FXML public TextField reservationTF;
-    @FXML public Button paymentButton;
     @FXML public AnchorPane root;
 
 
