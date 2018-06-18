@@ -59,6 +59,7 @@ public class UserController {
     private StringBuilder roomType;
     int idGast;
     private int actualPrice;
+    Integer peopleAmount = null;
 
 
 
@@ -303,9 +304,12 @@ public class UserController {
             Stage extraServStage = new Stage();
             extraServStage.setTitle("Extra services");
             FXMLLoader extraServLoader = new FXMLLoader(getClass().getResource("extraServicesForm.fxml"));
+            AnchorPane root = extraServLoader.load();
             extraServController = extraServLoader.getController();
             extraServController.initMenuButton(null);//TODO=provide collection for initialization
-            Scene extraServScene = new Scene(extraServController.root);
+            extraServController.amountOfPeople = peopleAmount;
+            extraServController.setValueFactoryForMB();
+            Scene extraServScene = new Scene(root);
             extraServStage.setScene(extraServScene);
             extraServStage.initOwner(this.root.getScene().getWindow());
             extraServStage.initModality(Modality.WINDOW_MODAL);
@@ -368,10 +372,11 @@ public class UserController {
         selRoomTypeMB.setText("Select room type");
         checkinTF.setText("");
         checkoutTF.setText("");
-        peopleTextField.setText("");
+        peopleTextField.setText("1");
         calendar.setValue(null);
         checkinDate = null;
         checkoutDate = null;
+        peopleAmount = null;
     }
 
 
@@ -381,7 +386,7 @@ public class UserController {
             try {
                 Statement stmt = Model.connection.createStatement();
                 selRoomTypeMB.getItems().removeIf(e -> !e.getText().equals("Doesn't matter"));
-                int peopleAmount;
+
                 if(peopleTextField.getText().equals(""))
                     peopleAmount = 1;
                 else
@@ -579,10 +584,7 @@ public class UserController {
             confirmStage.setScene(resConfirmScene);
             resConfirmController.backB.setOnAction(e -> {
                 confirmStage.close();
-
             });
-
-
 
             resConfirmController.confirmB.setOnAction(e -> {
                 try{
