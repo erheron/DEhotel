@@ -28,12 +28,20 @@ public class ReserveConfirmationController {
         private String checkOut;
         private int price;
         public SimpleBooleanProperty checked;
+        private StringBuilder extraService;
         ReservationTableView(String room, String in, String out, int price){
             this.room = room;
             checkIn = in;
             checkOut = out;
             this.price = price;
             checked = new SimpleBooleanProperty(true);
+            extraService = new StringBuilder("{");
+        }
+
+        void addService(String service){
+            if(!extraService.toString().equals("{") && !service.equals("}"))
+                extraService.append(" ,");
+            extraService.append(service);
         }
 
         public String getRoom() {
@@ -55,6 +63,10 @@ public class ReserveConfirmationController {
         public SimpleBooleanProperty isChecked() {
             return checked;
         }
+
+        public String getExtraService() {
+            return extraService.toString();
+        }
     }
     public void reservationList(List<UserController.Pair<UserController.Reservation, List<UserController.Services>>> list){
         this.list = list;
@@ -67,8 +79,14 @@ public class ReserveConfirmationController {
         TableColumn checkOutTC = new TableColumn("Check out");
         TableColumn priceTC = new TableColumn("Price");
         TableColumn<ReservationTableView, Boolean> checkColumn = new TableColumn<>("Checked");
+        TableColumn servicesTC = new TableColumn("Extra Services List");
         for(UserController.Pair<UserController.Reservation, List<UserController.Services>> pair : list){
-            data.add(new ReservationTableView(pair.t.roomType, pair.t.checkinDate, pair.t.checkoutDate, pair.t.price));
+            ReservationTableView reservationTableView = new ReservationTableView(pair.t.roomType, pair.t.checkinDate, pair.t.checkoutDate, pair.t.price);
+            for(UserController.Services serv : pair.u){
+                reservationTableView.addService(serv.name);
+            }
+            reservationTableView.addService("}");
+            data.add(reservationTableView);
         }
         roomTC.setCellValueFactory(
                 new PropertyValueFactory<>("room"));
@@ -88,9 +106,11 @@ public class ReserveConfirmationController {
             });
             return checkBox;
         });
+        servicesTC.setCellValueFactory(
+                new PropertyValueFactory<>("extraService"));
 
         mainTableView.setItems(data);
-        mainTableView.getColumns().addAll(roomTC, checkInTC, checkOutTC, priceTC, checkColumn);
+        mainTableView.getColumns().addAll(roomTC, checkInTC, checkOutTC, priceTC, checkColumn, servicesTC);
     }
 
     public void setTotalCostTF(){

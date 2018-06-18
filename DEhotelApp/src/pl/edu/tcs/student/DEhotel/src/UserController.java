@@ -58,7 +58,6 @@ public class UserController {
     private final String pattern = "yyyy-MM-dd";
     private StringBuilder roomType;
     int idGast;
-    private int actualPrice;
     Integer peopleAmount = null;
 
 
@@ -95,22 +94,24 @@ public class UserController {
         }
     }
     class Services{
-        String services;
+        String name;
+        int services;
         String dateFrom;
         String dateTo;
         int number;
-        public Services(){
-            services = null;
-        }
-        public Services(String s, String dateFrom, String dateTo, int number){
+        int price;
+        public Services(int s, String dateFrom, String dateTo, int number, int price, String name){
             services = s;
             this.dateFrom = dateFrom;
             this.dateTo = dateTo;
             this.number = number;
+            this.price = price;
+            this.name = name;
         }
     }
 
     List<Pair<Reservation, List<Services>> > reservations = new ArrayList<>();
+    List<Services> actualServices = new ArrayList<>();
     private LocalDate checkinDate, checkoutDate;
 
     /*----------------end of block------------------
@@ -299,12 +300,25 @@ public class UserController {
     }
     public void extraServicesBaction(ActionEvent actionEvent) {
         try{
+            Statement statement = Model.connection.createStatement();
+            String selectServices = "select * from uslugi_dod";
+            ResultSet rs = statement.executeQuery(selectServices);
+            // ArrayList<Integer> id = new ArrayList<>(); //id_uslugi
+            ArrayList<String> names = new ArrayList<>(); //nazwa
+            ArrayList<Integer> prices = new ArrayList<>(); //ceny
+            while(rs.next()){
+                //id.add(rs.getInt("id_uslugi_dod"));
+                names.add(rs.getString("nazwa"));
+                prices.add(rs.getInt("cena"));
+            }
+
             Stage extraServStage = new Stage();
             extraServStage.setTitle("Extra services");
             FXMLLoader extraServLoader = new FXMLLoader(getClass().getResource("extraServicesForm.fxml"));
             AnchorPane root = extraServLoader.load();
             extraServController = extraServLoader.getController();
-            extraServController.initMenuButton(null);//TODO=provide collection for initialization
+            extraServController.addUser(this);
+            extraServController.initMenuButton(names);//TODO=provide collection for initialization
             extraServController.amountOfPeople = peopleAmount;
             extraServController.setValueFactoryForMB();
             Scene extraServScene = new Scene(root);
@@ -317,25 +331,7 @@ public class UserController {
             //TODO=widze 2 opcje, 1) ustalenie tu (UserController) handlera z dostępem do pół
             //TODO=2) coś w tym kontrolerże z ew. pobieraniem pól wprost typu ;C.pole'
 
-            Statement statement = Model.connection.createStatement();
-            String selectServices = "select * from uslugi_dod";
-            ResultSet rs = statement.executeQuery(selectServices);
-            // ArrayList<Integer> id = new ArrayList<>(); //id_uslugi
-            ArrayList<String> names = new ArrayList<>(); //nazwa
-            ArrayList<Integer> prices = new ArrayList<>(); //ceny
-            while(rs.next()){
-                //id.add(rs.getInt("id_uslugi_dod"));
-                names.add(rs.getString("nazwa"));
-                prices.add(rs.getInt("cena"));
-            }
             //!!!!!!!!!!!PO DODANIU USLUGI
-            /*
-            String selectIdAndPrice = "select id_uslugi_dod, cena from uslugi_dod where nazwa = " + wybranaUluga + ";";
-            ResultSet rs4 = statement.executeQuery(selectIdAndPrice);
-            rs4.next();
-            int daysServices = policzyc dni;
-            int amount = liczba dni;
-            actualPrice += rs4.getInt("id_uslugi_dod") *daysServices * amount ;*/
             //TODO = wybieranie uslug
         }catch (Exception e){
             System.err.println(e.getMessage());
@@ -455,16 +451,18 @@ public class UserController {
             ResultSet rs = statement.executeQuery(select.toString());
             rs.next();
             int idRoom = rs.getInt("id_pokoju");
-            String selectPrice ="select oblicz_znizke(" + idGast + ", (" + actualPrice +" + cena_podstawowa) * ('" + checkoutTF.getText() + "'::date - '" + checkinTF.getText() + "'::date), '" +checkinTF.getText() + "'::date) as cena from pokoje where id_pokoju = " + idRoom + ";";
+            int actualPrice = 0;
+            for(Services serv : actualServices){
+                actualPrice += serv.price;
+            }
+            String selectPrice ="select oblicz_znizke(" + idGast + ", " + actualPrice +" + ((cena_podstawowa) * ('" + checkoutTF.getText() + "'::date - '" + checkinTF.getText() + "'::date)), '" +checkinTF.getText() + "'::date) as cena from pokoje where id_pokoju = " + idRoom + ";";
             ResultSet rs2 = statement.executeQuery(selectPrice);
             rs2.next();
             int price = rs2.getInt("cena");
             Reservation reservation = new Reservation(checkinTF.getText(), checkoutTF.getText(), Integer.parseInt(peopleTextField.getText()), selRoomTypeMB.getText(), idRoom, price);
-            reservations.add(new Pair<Reservation, List<Services>>(reservation, new ArrayList<>()));
+            reservations.add(new Pair<Reservation, List<Services>>(reservation, actualServices));
             String drop = "drop view if exists reserved";
             statement.executeUpdate(drop);
-            // String updateOccupied = "update Occupied set (data_od, data_do, id_pokoju) = ('" + checkinTF.getText()+ "'::date, '" + checkoutTF.getText() + "'::date, "+ idRoom+");";
-            // statement.executeUpdate(updateOccupied);
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -603,16 +601,24 @@ public class UserController {
                         }
                         i++;
                     }
+
                     for (Pair<Reservation, List<Services>> pair : reservations) {
                         //insert into
                         String insert = "insert into rezerwacje_pokoje values (" + mainReserveId + ", default, " + pair.t.idRoom + ", '" + pair.t.checkinDate + "'::date, '" + pair.t.checkoutDate + "'::date, " + pair.t.price + ", 'G', " + pair.t.amountOfPeople + ", default);";
-                        //System.out.println(insert);
                         statement.executeUpdate(insert);
                         String selectIdOne = "select id_rez_pojedynczej from rezerwacje_pokoje order by 1 desc limit 1;";
                         ResultSet rs3 = statement.executeQuery(selectIdOne);
                         rs3.next();
                         changeConfirmationStatus(ConfirmationStatus.Default);
-                        stringBuilder.append(mainReserveId.toString() + "/" + rs3.getInt("id_rez_pojedynczej")+"\n");
+                        int idOne = rs3.getInt("id_rez_pojedynczej");
+                        stringBuilder.append(mainReserveId.toString() + "/" + idOne +"\n");
+
+                        int j=0;
+                        for(Services services : pair.u){
+                            String insertServ =  "insert into usl_rez values (" + pair.u.get(j).services + ", " + idOne + ",  " + pair.u.get(j).number + ", '"+ pair.u.get(j).dateFrom + "'::date, '"  + pair.u.get(j).dateTo + "'::date, null);";
+                            j++;
+                            statement.executeUpdate(insertServ);
+                        }
                     }
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Reservation confirmed");

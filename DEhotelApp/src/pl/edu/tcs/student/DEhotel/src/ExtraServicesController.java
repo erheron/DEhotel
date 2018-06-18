@@ -2,7 +2,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -14,19 +17,35 @@ public class ExtraServicesController {
     public DatePicker calendar1;
     public DatePicker calendar2;
     public Spinner<Integer> spinner1;
+    private UserController controller;
 
     LocalDate dateFrom = null, dateTo = null;
     String chosenOption;
     int amountOfPeople = 1;
 
+    void addUser(UserController controller){
+        this.controller = controller;
+    }
 
     public void setValueFactoryForMB(){
         spinner1.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,amountOfPeople,1));
     }
     public void confirmBaction(ActionEvent actionEvent) {
-        //TODO=communicating with UserController, that way???
         if(check()){
-            //todo=do what???
+            try {
+
+                Statement statement = Model.connection.createStatement();
+                String selectIdAndPrice = "select id_uslugi_dod, cena from uslugi_dod where nazwa = '" + chosenOption + "';";
+                ResultSet rs4 = statement.executeQuery(selectIdAndPrice);
+                rs4.next();
+                int daysServices = dateFrom.until(dateTo).getDays();
+                UserController.Services services = controller.new Services(rs4.getInt("id_uslugi_dod"), dateFrom.toString(), dateTo.toString(), amountOfPeople, rs4.getInt("cena") * daysServices * amountOfPeople, chosenOption);
+                controller.actualServices.add(services);
+                ((Stage) confirmB.getParent().getScene().getWindow()).close();
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
