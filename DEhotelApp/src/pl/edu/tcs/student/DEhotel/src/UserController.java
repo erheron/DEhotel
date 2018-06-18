@@ -303,9 +303,10 @@ public class UserController {
             Stage extraServStage = new Stage();
             extraServStage.setTitle("Extra services");
             FXMLLoader extraServLoader = new FXMLLoader(getClass().getResource("extraServicesForm.fxml"));
+            AnchorPane root = extraServLoader.load();
             extraServController = extraServLoader.getController();
             extraServController.initMenuButton(null);//TODO=provide collection for initialization
-            Scene extraServScene = new Scene(extraServController.root);
+            Scene extraServScene = new Scene(root);
             extraServStage.setScene(extraServScene);
             extraServStage.initOwner(this.root.getScene().getWindow());
             extraServStage.initModality(Modality.WINDOW_MODAL);
