@@ -62,8 +62,6 @@ public class UserController {
     Integer peopleAmount = null;
 
 
-
-
     //field for confirmation from pressing 'reserve all'
     private enum ConfirmationStatus{
         Default,
