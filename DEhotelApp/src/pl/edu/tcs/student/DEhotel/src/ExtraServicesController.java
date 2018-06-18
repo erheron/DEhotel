@@ -1,8 +1,6 @@
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 
 import java.time.LocalDate;
@@ -13,10 +11,18 @@ public class ExtraServicesController {
     @FXML public AnchorPane root;
     @FXML public Button confirmB;
     @FXML public MenuButton selectServiceMB;
+    public DatePicker calendar1;
+    public DatePicker calendar2;
+    public Spinner<Integer> spinner1;
 
     LocalDate dateFrom = null, dateTo = null;
     String chosenOption;
+    int amountOfPeople = 1;
 
+
+    public void setValueFactoryForMB(){
+        spinner1.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,amountOfPeople,1));
+    }
     public void confirmBaction(ActionEvent actionEvent) {
         //TODO=communicating with UserController, that way???
         if(check()){
@@ -43,5 +49,13 @@ public class ExtraServicesController {
     boolean check(){
         if(chosenOption == null || dateFrom == null || dateTo == null) return false;
         return !dateFrom.isAfter(dateTo);
+    }
+
+    public void calendar1action(ActionEvent actionEvent) {
+        dateFrom = calendar1.getValue();
+    }
+
+    public void calendar2action(ActionEvent actionEvent) {
+        dateTo = calendar2.getValue();
     }
 }

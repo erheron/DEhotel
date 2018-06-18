@@ -26,6 +26,8 @@ public class Model extends Application {
         primaryStage.setTitle("DEhotel - from Krakow with love :)");
         //login form goes first
         Stage loginStage = new Stage();
+        loginStage.setTitle("log in");
+        loginStage.setResizable(false);
         FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("login.fxml"));
         AnchorPane loginRoot = loginLoader.load();
         loginController = loginLoader.getController();
