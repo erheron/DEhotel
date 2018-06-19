@@ -1,6 +1,7 @@
+drop function usun_sprzet(integer);
 drop trigger dodaj_kare on rezerwacje_pokoje;
 drop function dodaj_kare();
-drop function if exists oblicz_znizke(integer, numeric, date);
+drop function oblicz_znizke(integer, numeric, date);
 drop table if exists email_hash cascade;
 drop table if exists usl_rez;
 drop table if exists uslugi_dod;
