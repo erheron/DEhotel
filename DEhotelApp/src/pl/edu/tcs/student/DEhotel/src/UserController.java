@@ -514,26 +514,35 @@ public class UserController {
     }
     void  addTableView(String dFrom, String dTO){
         try {
-            String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date and anulowane_data is null;";
+            String selectIdMain = "select id_rez_zbiorczej from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date and anulowane_data is null;";
             Statement statement = Model.connection.createStatement();
-            ResultSet rs = statement.executeQuery(selectVisits);
+            ResultSet rs1 = statement.executeQuery(selectIdMain);
             TableView table = new TableView();
+            TableColumn idMainTC = new TableColumn("Main reservation");
             TableColumn idResTC = new TableColumn("Id reservation");
-            idResTC.setResizable(true);
-            idResTC.setPrefWidth(150);
+
             TableColumn fromTC = new TableColumn("Check in");
-            fromTC.setResizable(true);
-            fromTC.setPrefWidth(140);
+
             TableColumn toTC = new TableColumn("Check out");
-            toTC.setPrefWidth(140);
+
             TableColumn priceTC = new TableColumn("Price");
-            priceTC.setPrefWidth(100);
+
 
             ObservableList<ReserveConfirmationController.ReservationTableView> data =
                     FXCollections.observableArrayList();
-            while (rs.next()) {
-                data.add(new ReserveConfirmationController.ReservationTableView(rs.getString("id_rez_zbiorczej"), rs.getString("data_od"), rs.getString("data_do"), rs.getInt("cena")));
+            while (rs1.next()) {
+                int idMain = rs1.getInt("id_rez_zbiorczej");
+                String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date and anulowane_data is null and id_rez_zbiorczej = " + idMain + ";";
+                Statement statement2 = Model.connection.createStatement();
+                ResultSet rs2 = statement2.executeQuery(selectVisits);
+
+                data.add(new ReserveConfirmationController.ReservationTableView(idMain));
+                while (rs2.next()){
+                    data.add(new ReserveConfirmationController.ReservationTableView(rs2.getInt("id_rez_pojedynczej"), rs2.getString("data_od"), rs2.getString("data_do"), rs2.getString("cena")));
+                }
             }
+            idMainTC.setCellValueFactory(
+                    new PropertyValueFactory<>("extraService"));
             idResTC.setCellValueFactory(
                     new PropertyValueFactory<>("room"));
             fromTC.setCellValueFactory(
@@ -541,10 +550,10 @@ public class UserController {
             toTC.setCellValueFactory(
                     new PropertyValueFactory<>("checkOut"));
             priceTC.setCellValueFactory(
-                    new PropertyValueFactory<>("price"));
+                    new PropertyValueFactory<>("priceSee"));
 
             table.setItems(data);
-            table.getColumns().addAll(idResTC, fromTC, toTC, priceTC);
+            table.getColumns().addAll(idMainTC, idResTC, fromTC, toTC, priceTC);
 
             VBox vbox = new VBox();
             vbox.setSpacing(5);
