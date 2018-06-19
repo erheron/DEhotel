@@ -198,7 +198,7 @@ public class UserController {
         }catch(Exception e){
             e.printStackTrace();
         }
-        setAllVisible();
+        setAllVisible(true);
     }
 
     public void seeMyVisitsButtonOnAction(ActionEvent actionEvent) {
@@ -342,22 +342,22 @@ public class UserController {
 
     /*----------------------7---------------------
      *           bunch of helper  methods            */
-    private void setAllVisible() {
-        calendar.setVisible(true);
-        calendarLabel.setVisible(true);
-        checkinButton.setVisible(true);
-        checkoutButton.setVisible(true);
-        checkinTF.setVisible(true);
-        checkoutTF.setVisible(true);
-        peopleTextField.setVisible(true);
-        selRoomTypeMB.setVisible(true);
-        howManyPeopleL.setVisible(true);
+    private void setAllVisible(boolean b) {
+        calendar.setVisible(b);
+        calendarLabel.setVisible(b);
+        checkinButton.setVisible(b);
+        checkoutButton.setVisible(b);
+        checkinTF.setVisible(b);
+        checkoutTF.setVisible(b);
+        peopleTextField.setVisible(b);
+        selRoomTypeMB.setVisible(b);
+        howManyPeopleL.setVisible(b);
 
     }
-    private void enableRegistration(){
-        mainReserveB.setVisible(true);
-        extraServicesB.setVisible(true);
-        oneMoreResB.setVisible(true);
+    private void enableRegistration(boolean b){
+        mainReserveB.setVisible(b);
+        extraServicesB.setVisible(b);
+        oneMoreResB.setVisible(b);
     }
 
     private void bringToInitialState(){
@@ -427,7 +427,7 @@ public class UserController {
         roomType = new StringBuilder(x);
     }
     public void selRoomTypeMBaction(ActionEvent actionEvent) {
-        enableRegistration();
+        enableRegistration(true);
         //
     }
     private boolean checkData(){
@@ -641,6 +641,9 @@ public class UserController {
                 confirmStage.close();
                 changeConfirmationStatus(ConfirmationStatus.Back);
                 confirmStage.close();
+                bringToInitialState();
+                setAllVisible(false);
+                enableRegistration(false);
             });
             confirmStage.show();
         }catch(IOException e){
@@ -653,6 +656,7 @@ public class UserController {
         confirmationStatus = s;
         return;
     }
+
     /*----------------end of block------------------
      *                      7                     */
 

@@ -1,7 +1,11 @@
 #!/bin/bash
 user=$USER
-#echo "Attempting to create database \"hotel\" as root, required sudo privilegies. You can crete it yourself"
-#sudo su -l postgres -c "createdb hotel --owner='$name' --no-password" 2&> /dev/null
+echo "Checking if database \"hotel\" already exists"
+if psql -lqt | cut -d \| -f 1 | grep -qw hotel; then echo "OK, present"
+else
+	echo "Attempting to create database \"hotel\" as root, required sudo privilegies. You can also create it yourself"
+	sudo su -l postgres -c "createdb hotel --owner='$name' --no-password" 2&> /dev/null
+fi
 
 
 rm userspasswords.txt
@@ -17,7 +21,7 @@ hash pip3 2> /dev/null || { echo "No pip3 detected, aborting..."; exit 1; }
 echo "Checking ig 'psycopg2' is installed"
 echo "" > log
 pip3 show psycopg2 > log
-if [ -s log ]; then echo "Already installed" 
+if [ -s log ]; then echo "OK, installed" 
 else 
 	pip3 install psycopg2
 	echo "Installed properly"
@@ -27,7 +31,7 @@ echo "" > log
 #checking 'faker'
 echo "Installing third-party package 'Faker' "
 pip3 show Faker > log
-if [ -s log ]; then echo "Already installed" 
+if [ -s log ]; then echo "OK, installed" 
 else 
 	pip3 install Faker
 	echo "Installed properly"
