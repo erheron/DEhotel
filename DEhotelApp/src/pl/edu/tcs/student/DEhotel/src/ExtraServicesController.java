@@ -19,6 +19,7 @@ public class ExtraServicesController {
     public Spinner<Integer> spinner1;
     private UserController controller;
 
+    LocalDate checkDateFrom, checkDateTo;//from UserController
     LocalDate dateFrom = null, dateTo = null;
     String chosenOption;
     int amountOfPeople = 1;
@@ -46,6 +47,11 @@ public class ExtraServicesController {
             }catch (Exception e){
                 e.printStackTrace();
             }
+        }else{
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error occured");
+            alert.setHeaderText("Incorrect data!");
+            alert.showAndWait();
         }
     }
 
@@ -66,8 +72,8 @@ public class ExtraServicesController {
     }
 
     boolean check(){
-        if(chosenOption == null || dateFrom == null || dateTo == null) return false;
-        return !dateFrom.isAfter(dateTo);
+        if(chosenOption == null || dateFrom == null || dateTo == null || dateFrom.isAfter(dateTo) || dateTo.isBefore(checkDateFrom) || dateFrom.isAfter(checkDateTo)) return false;
+        return true;
     }
 
     public void calendar1action(ActionEvent actionEvent) {
