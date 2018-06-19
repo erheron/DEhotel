@@ -198,7 +198,7 @@ public class UserController {
         }catch(Exception e){
             e.printStackTrace();
         }
-        setAllVisible();
+        setAllVisible(true);
     }
 
     public void seeMyVisitsButtonOnAction(ActionEvent actionEvent) {
@@ -235,6 +235,31 @@ public class UserController {
                 for( ; i < number.length(); i++){
                     id.append(number.charAt(i));
                 }
+                String checkCancel = "select id_goscia, data_od from rezerwacje_goscie natural join rezerwacje_pokoje where id_rez_pojedynczej = " + Integer.parseInt(id.toString()) +" and id_rez_zbiorczej= " + Integer.parseInt(mainID.toString()) + ";";
+                Statement statement0 = Model.connection.createStatement();
+                //System.out.println(checkCancel);
+                ResultSet rs = statement0.executeQuery(checkCancel);
+                if (!rs.isBeforeFirst() ) {
+                    throw new Exception();
+                }
+                rs.next();
+                if(rs.getInt("id_goscia")!=idGast) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error Dialog");
+                    alert.setHeaderText("Incorrect data!");
+                    alert.setContentText("Please, enter your reservation key.");
+                    alert.showAndWait();
+                    return;
+                }
+                if(LocalDate.parse(rs.getString("data_od")).isAfter(LocalDate.now())) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error Dialog");
+                    alert.setHeaderText("Incorrect data!");
+                    alert.setContentText("It's too late to cancel reservation.");
+                    alert.showAndWait();
+                    return;
+                }
+
                 String cancel = "update rezerwacje_pokoje set anulowane_data = current_date  where id_rez_pojedynczej = " + Integer.parseInt(id.toString()) +" and id_rez_zbiorczej = " + Integer.parseInt(mainID.toString()) + ";";
                 Statement statement = Model.connection.createStatement();
                 statement.executeUpdate(cancel);
@@ -342,22 +367,22 @@ public class UserController {
 
     /*----------------------7---------------------
      *           bunch of helper  methods            */
-    private void setAllVisible() {
-        calendar.setVisible(true);
-        calendarLabel.setVisible(true);
-        checkinButton.setVisible(true);
-        checkoutButton.setVisible(true);
-        checkinTF.setVisible(true);
-        checkoutTF.setVisible(true);
-        peopleTextField.setVisible(true);
-        selRoomTypeMB.setVisible(true);
-        howManyPeopleL.setVisible(true);
+    private void setAllVisible(boolean b) {
+        calendar.setVisible(b);
+        calendarLabel.setVisible(b);
+        checkinButton.setVisible(b);
+        checkoutButton.setVisible(b);
+        checkinTF.setVisible(b);
+        checkoutTF.setVisible(b);
+        peopleTextField.setVisible(b);
+        selRoomTypeMB.setVisible(b);
+        howManyPeopleL.setVisible(b);
 
     }
-    private void enableRegistration(){
-        mainReserveB.setVisible(true);
-        extraServicesB.setVisible(true);
-        oneMoreResB.setVisible(true);
+    private void enableRegistration(boolean b){
+        mainReserveB.setVisible(b);
+        extraServicesB.setVisible(b);
+        oneMoreResB.setVisible(b);
     }
 
     private void bringToInitialState(){
@@ -427,7 +452,7 @@ public class UserController {
         roomType = new StringBuilder(x);
     }
     public void selRoomTypeMBaction(ActionEvent actionEvent) {
-        enableRegistration();
+        enableRegistration(true);
         //
     }
     private boolean checkData(){
@@ -514,26 +539,35 @@ public class UserController {
     }
     void  addTableView(String dFrom, String dTO){
         try {
-            String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date and anulowane_data is null;";
+            String selectIdMain = "select id_rez_zbiorczej from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date and anulowane_data is null;";
             Statement statement = Model.connection.createStatement();
-            ResultSet rs = statement.executeQuery(selectVisits);
+            ResultSet rs1 = statement.executeQuery(selectIdMain);
             TableView table = new TableView();
+            TableColumn idMainTC = new TableColumn("Main reservation");
             TableColumn idResTC = new TableColumn("Id reservation");
-            idResTC.setResizable(true);
-            idResTC.setPrefWidth(150);
+
             TableColumn fromTC = new TableColumn("Check in");
-            fromTC.setResizable(true);
-            fromTC.setPrefWidth(140);
+
             TableColumn toTC = new TableColumn("Check out");
-            toTC.setPrefWidth(140);
+
             TableColumn priceTC = new TableColumn("Price");
-            priceTC.setPrefWidth(100);
+
 
             ObservableList<ReserveConfirmationController.ReservationTableView> data =
                     FXCollections.observableArrayList();
-            while (rs.next()) {
-                data.add(new ReserveConfirmationController.ReservationTableView(rs.getString("id_rez_zbiorczej"), rs.getString("data_od"), rs.getString("data_do"), rs.getInt("cena")));
+            while (rs1.next()) {
+                int idMain = rs1.getInt("id_rez_zbiorczej");
+                String selectVisits = "select * from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date and anulowane_data is null and id_rez_zbiorczej = " + idMain + ";";
+                Statement statement2 = Model.connection.createStatement();
+                ResultSet rs2 = statement2.executeQuery(selectVisits);
+
+                data.add(new ReserveConfirmationController.ReservationTableView(idMain));
+                while (rs2.next()){
+                    data.add(new ReserveConfirmationController.ReservationTableView(rs2.getInt("id_rez_pojedynczej"), rs2.getString("data_od"), rs2.getString("data_do"), rs2.getString("cena")));
+                }
             }
+            idMainTC.setCellValueFactory(
+                    new PropertyValueFactory<>("extraService"));
             idResTC.setCellValueFactory(
                     new PropertyValueFactory<>("room"));
             fromTC.setCellValueFactory(
@@ -541,10 +575,10 @@ public class UserController {
             toTC.setCellValueFactory(
                     new PropertyValueFactory<>("checkOut"));
             priceTC.setCellValueFactory(
-                    new PropertyValueFactory<>("price"));
+                    new PropertyValueFactory<>("priceSee"));
 
             table.setItems(data);
-            table.getColumns().addAll(idResTC, fromTC, toTC, priceTC);
+            table.getColumns().addAll(idMainTC, idResTC, fromTC, toTC, priceTC);
 
             VBox vbox = new VBox();
             vbox.setSpacing(5);
@@ -632,6 +666,9 @@ public class UserController {
                 confirmStage.close();
                 changeConfirmationStatus(ConfirmationStatus.Back);
                 confirmStage.close();
+                bringToInitialState();
+                setAllVisible(false);
+                enableRegistration(false);
             });
             confirmStage.show();
         }catch(IOException e){
@@ -644,6 +681,7 @@ public class UserController {
         confirmationStatus = s;
         return;
     }
+
     /*----------------end of block------------------
      *                      7                     */
 

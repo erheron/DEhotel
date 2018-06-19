@@ -1,3 +1,5 @@
+drop trigger dodaj_kare on rezerwacje_pokoje;
+drop function dodaj_kare();
 drop function if exists oblicz_znizke(integer, numeric, date);
 drop table if exists email_hash cascade;
 drop table if exists usl_rez;
