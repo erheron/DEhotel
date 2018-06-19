@@ -25,7 +25,7 @@ language 'plpgsql';
 create or replace function dodaj_kare()
     returns trigger as $dodaj_kare$
 begin
-    if old.data_od - current_date <= 1 then
+    if old.data_od - current_date <= 1 and new.anulowane_data is not null then
         insert into kary values (default, old.id_rez_zbiorczej, current_date, old.cena*0.10);
     end if;
     return new;

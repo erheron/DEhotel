@@ -26,16 +26,34 @@ public class ReserveConfirmationController {
         private String room;
         private String checkIn;
         private String checkOut;
-        private int price;
+        private Integer price;
+        private String priceSee;
         public SimpleBooleanProperty checked;
         private StringBuilder extraService;
-        ReservationTableView(String room, String in, String out, int price){
+        ReservationTableView(String room, String in, String out, Integer price){
             this.room = room;
             checkIn = in;
             checkOut = out;
             this.price = price;
             checked = new SimpleBooleanProperty(true);
             extraService = new StringBuilder("{");
+        }
+
+        ReservationTableView(Integer id){
+            extraService = new StringBuilder(id.toString());
+            room = "";
+            checkIn = "";
+            checkOut = "";
+            priceSee = "";
+        }
+
+        ReservationTableView(Integer room, String in, String out, String price){
+            extraService = new StringBuilder("");
+            this.room = room.toString();
+            checkIn = in;
+            checkOut = out;
+            this.priceSee = price;
+            checked = new SimpleBooleanProperty(true);
         }
 
         void addService(String service){
@@ -66,6 +84,10 @@ public class ReserveConfirmationController {
 
         public String getExtraService() {
             return extraService.toString();
+        }
+
+        public String getPriceSee() {
+            return priceSee;
         }
     }
     public void reservationList(List<UserController.Pair<UserController.Reservation, List<UserController.Services>>> list){
