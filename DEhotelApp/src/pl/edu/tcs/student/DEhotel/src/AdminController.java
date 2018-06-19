@@ -22,7 +22,7 @@ public class AdminController {
     @FXML public MenuButton selectMenu;
     @FXML public TextField reservationTF;
     @FXML public AnchorPane root;
-
+    private int actualIdEquipment;
 
     class Penalty{
         String reservationID, equipment;
@@ -54,6 +54,7 @@ public class AdminController {
 
     public void oneMoreButtonAction(ActionEvent actionEvent) {
         //create new Penalty
+        selectMenu.getItems().clear();
         addPenalty();
         clearPenaltyState();
     }
@@ -61,6 +62,7 @@ public class AdminController {
     public void submitButtonAction(ActionEvent actionEvent) {
         addPenalty();
         submitPenalty();
+        selectMenu.getItems().clear();
         hideAll();
     }
 
@@ -77,6 +79,8 @@ public class AdminController {
                 String insert = "insert into kary values (default, " + penalty.reservationID + ", current_date, " + penalty.price + ");";
                 Statement statement = Model.connection.createStatement();
                 statement.executeUpdate(insert);
+                String deleteEquipment = "select usun_sprzet( " + actualIdEquipment + ");";
+                statement.executeQuery(deleteEquipment);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -156,8 +160,17 @@ public class AdminController {
             while(rs.next()){
                 MenuItem nextMI = new MenuItem(rs.getString("nazwa"));
                 nextMI.setOnAction(e -> {
+                    String selectId = "select id from (pokoje_wyposazenie p join wyposazenie w on p.id_wyposazenia=w.id) join rodzaje_wyposazenia r on w.id_rodzaju=r.id_rodzaju_wyposazenia where p.id_pokoju = " + room + " and nazwa = '"+nextMI.getText()+"' limit 1;";
+                    try {
+                        Statement statement1 = Model.connection.createStatement();
+                        ResultSet rs2 = statement1.executeQuery(selectId);
+                        rs2.next();
+                        actualIdEquipment = rs2.getInt("id");
+                    }catch (Exception e2){
+                        e2.printStackTrace();
+                    }
                     selectMenu.setText(nextMI.getText());
-                });
+            });
                 selectMenu.getItems().add(nextMI);
             }
         }catch(Exception e){
