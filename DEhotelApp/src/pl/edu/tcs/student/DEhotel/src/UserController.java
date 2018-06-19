@@ -235,6 +235,31 @@ public class UserController {
                 for( ; i < number.length(); i++){
                     id.append(number.charAt(i));
                 }
+                String checkCancel = "select id_goscia, data_od from rezerwacje_goscie natural join rezerwacje_pokoje where id_rez_pojedynczej = " + Integer.parseInt(id.toString()) +" and id_rez_zbiorczej= " + Integer.parseInt(mainID.toString()) + ";";
+                Statement statement0 = Model.connection.createStatement();
+                //System.out.println(checkCancel);
+                ResultSet rs = statement0.executeQuery(checkCancel);
+                if (!rs.isBeforeFirst() ) {
+                    throw new Exception();
+                }
+                rs.next();
+                if(rs.getInt("id_goscia")!=idGast) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error Dialog");
+                    alert.setHeaderText("Incorrect data!");
+                    alert.setContentText("Please, enter your reservation key.");
+                    alert.showAndWait();
+                    return;
+                }
+                if(LocalDate.parse(rs.getString("data_od")).isAfter(LocalDate.now())) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error Dialog");
+                    alert.setHeaderText("Incorrect data!");
+                    alert.setContentText("It's too late to cancel reservation.");
+                    alert.showAndWait();
+                    return;
+                }
+
                 String cancel = "update rezerwacje_pokoje set anulowane_data = current_date  where id_rez_pojedynczej = " + Integer.parseInt(id.toString()) +" and id_rez_zbiorczej = " + Integer.parseInt(mainID.toString()) + ";";
                 Statement statement = Model.connection.createStatement();
                 statement.executeUpdate(cancel);
