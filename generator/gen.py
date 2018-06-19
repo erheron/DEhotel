@@ -265,7 +265,7 @@ class maker:
 		for i in range(100):
 			res_id = res_id + 1
 			guest=random.randint(1, 200)
-			cur.execute('INSERT INTO rezerwacje_goscie(id_rez_zbiorczej, id_goscia) VALUES (%s,%s);', (res_id, guest))
+			cur.execute('INSERT INTO rezerwacje_goscie(id_goscia) VALUES (%s);', (guest,))
 			date_from=f_us.date_between(start_date='today', end_date='+2m')
 			date_to=date_from + timedelta(random.randint(1,10))
 			date_from=date_from.isoformat()
