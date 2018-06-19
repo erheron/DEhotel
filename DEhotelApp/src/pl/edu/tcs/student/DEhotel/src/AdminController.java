@@ -102,6 +102,7 @@ public class AdminController {
     void clearPenaltyState(){
         selectMenu.setText("Select equipment");
         reservationTF.setPromptText("type reservation id");
+        reservationTF.setText("");
     }
     void addPenalty(){
             try {
