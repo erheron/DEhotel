@@ -26,7 +26,7 @@ public class RegistrationController {
             statement.executeUpdate(insertHash);
             statement.executeUpdate(insertGast);
 
-            Files.write(Paths.get("userspasswords.txt"), new String("<email>:"+ emailTF.getText() +"     "+"<password>:"+passwordF.getText()+"\n").getBytes(), StandardOpenOption.APPEND);
+            //Files.write(Paths.get("userspasswords.txt"), new String("<email>:"+ emailTF.getText() +"     "+"<password>:"+passwordF.getText()+"\n").getBytes(), StandardOpenOption.APPEND);
             //Model.connection.commit();
             //Model.connection.setAutoCommit(true);
             ((Stage) submitButton.getParent().getScene().getWindow()).close();
