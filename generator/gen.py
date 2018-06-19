@@ -262,19 +262,23 @@ class maker:
 		cur.execute('SELECT COALESCE(MAX(id_rez_zbiorczej),0) FROM rezerwacje_goscie;')
 		rows = cur.fetchall()
 		res_id = rows[0][0]
-		print('res_id' + str(res_id))
 		for i in range(100):
+			res_id = res_id + 1
 			guest=random.randint(1, 200)
-			cur.execute('INSERT INTO rezerwacje_goscie(id_goscia) VALUES (%s);', (guest, ))
-			date_from=f_us.date_between(start_date='-5y', end_date='today')
+			cur.execute('INSERT INTO rezerwacje_goscie(id_rez_zbiorczej, id_goscia) VALUES (%s,%s);', (res_id, guest))
+			date_from=f_us.date_between(start_date='today', end_date='+2m')
 			date_to=date_from + timedelta(random.randint(1,10))
 			date_from=date_from.isoformat()
 			date_to=date_to.isoformat()
-			room_id=random.randint(1,10)
+			room_id=random.randint(1,85)
 			people=random.randint(1,3)
-			print('date_from ' + date_from + '  date_to ' + date_to)
-			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, plan_liczba_osob) VALUES (%s, %s, %s, %s, %s);',
-			(res_id, room_id, date_from, date_to, people))
+			cur.execute('SELECT MIN(cena_podstawowa) FROM pokoje WHERE id_pokoju = %s;',(room_id,));
+			rows=cur.fetchall()
+			price=rows[0][0]
+#			print('date_from ' + date_from + '  date_to ' + date_to)
+			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, cena, typ_platnosci, plan_liczba_osob) VALUES (%s, %s, %s, %s, %s, %s, %s);',
+			(res_id, room_id, date_from, date_to, price,'G', people))
+		conn.commit()
 
 
 #filling tables
@@ -294,6 +298,5 @@ mainMaker.insert_equipment_categories_static()
 
 #attempting to fill both 'wyposazenie' and 'pokoje_wyposazenie'
 mainMaker.fill_equipment_join_with_rooms()
-
 
 mainMaker.add_some_random_reservations()
