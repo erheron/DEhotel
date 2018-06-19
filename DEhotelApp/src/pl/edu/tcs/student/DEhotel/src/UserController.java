@@ -643,7 +643,7 @@ public class UserController {
 
                     for (Pair<Reservation, List<Services>> pair : reservations) {
                         //insert into
-                        String insert = "insert into rezerwacje_pokoje values (" + mainReserveId + ", default, " + pair.t.idRoom + ", '" + pair.t.checkinDate + "'::date, '" + pair.t.checkoutDate + "'::date, " + pair.t.price  + pair.t.amountOfPeople + ", default);";
+                        String insert = "insert into rezerwacje_pokoje values (" + mainReserveId + ", default, " + pair.t.idRoom + ", '" + pair.t.checkinDate + "'::date, '" + pair.t.checkoutDate + "'::date, " + pair.t.price +", "+ + pair.t.amountOfPeople + ", default);";
                         statement.executeUpdate(insert);
                         String selectIdOne = "select id_rez_pojedynczej from rezerwacje_pokoje order by 1 desc limit 1;";
                         ResultSet rs3 = statement.executeQuery(selectIdOne);

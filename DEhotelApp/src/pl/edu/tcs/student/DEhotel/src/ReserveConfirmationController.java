@@ -121,8 +121,8 @@ public class ReserveConfirmationController {
             checkBox.setEditable(true);
             checkBox.setSelectedStateCallback(index -> {
                 ReservationTableView r = mainTableView.getItems().get(index);
-                if(r.checked.getValue()) {System.err.println("you suck 1"); totalSum += mainTableView.getItems().get(index).price;}
-                else {System.err.println("you suck 2");totalSum -= mainTableView.getItems().get(index).price;}
+               // if(r.checked.getValue()) {System.err.println("you suck 1"); totalSum += mainTableView.getItems().get(index).price;}
+                //else {System.err.println("you suck 2");totalSum -= mainTableView.getItems().get(index).price;}
                 //totalCostTF.setText(totalSum.toString());
                 return r.checked;
             });
