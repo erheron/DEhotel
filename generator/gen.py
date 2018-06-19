@@ -266,11 +266,13 @@ class maker:
 			res_id = res_id + 1
 			guest=random.randint(1, 200)
 			cur.execute('INSERT INTO rezerwacje_goscie(id_goscia) VALUES (%s);', (guest,))
-			date_from=f_us.date_between(start_date='today', end_date='+2m')
+			date_from=f_us.date_between(start_date="today", end_date="+30d")
 			date_to=date_from + timedelta(random.randint(1,10))
 			date_from=date_from.isoformat()
 			date_to=date_to.isoformat()
-			room_id=random.randint(1,85)
+			cur.execute('SELECT MIN(id_pokoju) FROM pokoje p1 WHERE NOT EXISTS (SELECT * FROM rezerwacje_pokoje rp WHERE rp.id_pokoju = p1.id_pokoju AND NOT(rp.data_od >= %s::date OR rp.data_do <= %s::date));',(date_to, date_from)) 
+			rows=cur.fetchall()
+			room_id=rows[0][0]
 			people=random.randint(1,3)
 			cur.execute('SELECT MIN(cena_podstawowa) FROM pokoje WHERE id_pokoju = %s;',(room_id,));
 			rows=cur.fetchall()
@@ -285,18 +287,24 @@ class maker:
 mainMaker = maker()
 
 
-#filling guests, say there were about 200 guests in our hotel
-#always insert guests emails into 'email_hash' table
+print("Filling guests...........")
 mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_pl, False) 
 mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_us, False) 
+print(">Done")
 
-#filling rooms, they're static as I've decided
+print("Filling rooms............")
 mainMaker.insert_rooms_static()
+print(">Done")
 
-#filling equipment, also static but all data taken from real-world objects
+print("Filling equipment..............")
 mainMaker.insert_equipment_categories_static()
+print(">Done")
 
-#attempting to fill both 'wyposazenie' and 'pokoje_wyposazenie'
+print("Joining equipment with rooms............")
 mainMaker.fill_equipment_join_with_rooms()
+print(">Done")
 
+print("And some 'random' reservations.....")
 mainMaker.add_some_random_reservations()
+print(">Done")
+print("Have fun :)")
