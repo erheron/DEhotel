@@ -35,3 +35,21 @@ language 'plpgsql';
 
 create trigger dodaj_kare after update on rezerwacje_pokoje
 for each row execute procedure dodaj_kare();
+
+--usuwa zniszczony sprzet i dodaje do pokoju nowy
+create or replace function usun_sprzet(id_sprzetu integer)
+    returns void as
+$$
+declare
+    pokoj numeric;
+    sprzet integer;
+begin
+    pokoj = (select id_pokoju from pokoje_wyposazenie where id_wyposazenia = id_sprzetu);
+    delete from pokoje_wyposazenie where id_wyposazenia = id_sprzetu;
+    update wyposazenie set id = default where id=id_sprzetu;
+    sprzet = (select id from wyposazenie order by 1 desc limit 1);
+    insert into pokoje_wyposazenie values (pokoj, sprzet);
+end;
+$$
+language 'plpgsql';
+
