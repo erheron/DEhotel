@@ -539,7 +539,7 @@ public class UserController {
     }
     void  addTableView(String dFrom, String dTO){
         try {
-            String selectIdMain = "select id_rez_zbiorczej from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date and anulowane_data is null;";
+            String selectIdMain = "select distinct id_rez_zbiorczej from rezerwacje_pokoje natural join rezerwacje_goscie where id_goscia = " + idGast + " and data_od >= '" + dFrom + "'::date and data_do <= '" +dTO +"'::date and anulowane_data is null;";
             Statement statement = Model.connection.createStatement();
             ResultSet rs1 = statement.executeQuery(selectIdMain);
             TableView table = new TableView();
