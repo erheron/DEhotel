@@ -30,7 +30,6 @@ create table rezerwacje_pokoje(
 	data_od date not null default current_date check (data_od>=current_date),
 	data_do date not null default current_date + interval '1 day' check (data_od<data_do),
 	cena numeric not null,
-	typ_platnosci char(1) check (typ_platnosci='G' or typ_platnosci='P') not null, -- G-gotwka, P-przelew
 	plan_liczba_osob numeric,
 	anulowane_data date default null
 );

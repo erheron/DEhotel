@@ -270,16 +270,16 @@ class maker:
 			date_to=date_from + timedelta(random.randint(1,10))
 			date_from=date_from.isoformat()
 			date_to=date_to.isoformat()
-			cur.execute('SELECT MIN(id_pokoju) FROM pokoje p1 WHERE NOT EXISTS (SELECT * FROM rezerwacje_pokoje rp WHERE rp.id_pokoju = p1.id_pokoju AND NOT(rp.data_od >= %s::date OR rp.data_do <= %s::date));',(date_to, date_from)) 
+			people=random.randint(1,3)
+			cur.execute('SELECT MIN(id_pokoju) FROM pokoje p1 WHERE max_liczba_osob = %s AND NOT EXISTS (SELECT * FROM rezerwacje_pokoje rp WHERE rp.id_pokoju = p1.id_pokoju AND NOT(rp.data_od >= %s::date OR rp.data_do <= %s::date));',(people, date_to, date_from)) 
 			rows=cur.fetchall()
 			room_id=rows[0][0]
-			people=random.randint(1,3)
 			cur.execute('SELECT MIN(cena_podstawowa) FROM pokoje WHERE id_pokoju = %s;',(room_id,));
 			rows=cur.fetchall()
 			price=rows[0][0]
 #			print('date_from ' + date_from + '  date_to ' + date_to)
-			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, cena, typ_platnosci, plan_liczba_osob) VALUES (%s, %s, %s, %s, %s, %s, %s);',
-			(res_id, room_id, date_from, date_to, price,'G', people))
+			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, cena,  plan_liczba_osob) VALUES (%s, %s, %s, %s, %s, %s);',
+			(res_id, room_id, date_from, date_to, price, people))
 		conn.commit()
 
 

@@ -1,15 +1,11 @@
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
 
-import java.io.FilterInputStream;
 import java.util.List;
 
 public class ReserveConfirmationController {
@@ -18,6 +14,7 @@ public class ReserveConfirmationController {
     @FXML public TextField totalCostTF;
     @FXML public TableView<ReservationTableView> mainTableView;
     private List<UserController.Pair<UserController.Reservation, List<UserController.Services>>> list;
+    Integer totalSum =0;
 
     ObservableList<ReservationTableView> data =
             FXCollections.observableArrayList();
@@ -124,6 +121,9 @@ public class ReserveConfirmationController {
             checkBox.setEditable(true);
             checkBox.setSelectedStateCallback(index -> {
                 ReservationTableView r = mainTableView.getItems().get(index);
+                if(r.checked.getValue()) {System.err.println("you suck 1"); totalSum += mainTableView.getItems().get(index).price;}
+                else {System.err.println("you suck 2");totalSum -= mainTableView.getItems().get(index).price;}
+                //totalCostTF.setText(totalSum.toString());
                 return r.checked;
             });
             return checkBox;
@@ -136,10 +136,9 @@ public class ReserveConfirmationController {
     }
 
     public void setTotalCostTF(){
-        Integer sum =0;
         for(UserController.Pair<UserController.Reservation, List<UserController.Services>> pair : list){
-            sum+=pair.t.price;
+            totalSum +=pair.t.price;
         }
-        totalCostTF.setText(sum.toString());
+        totalCostTF.setText(totalSum.toString());
     }
 }
