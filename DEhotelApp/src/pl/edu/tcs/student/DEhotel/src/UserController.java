@@ -245,7 +245,7 @@ public class UserController {
                 rs.next();
                 if(rs.getInt("id_goscia")!=idGast) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error Dialog");
+                    alert.setTitle("Error occured");
                     alert.setHeaderText("Incorrect data!");
                     alert.setContentText("Please, enter your reservation key.");
                     alert.showAndWait();
@@ -253,7 +253,7 @@ public class UserController {
                 }
                 if(LocalDate.parse(rs.getString("data_od")).isAfter(LocalDate.now())) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error Dialog");
+                    alert.setTitle("Error occured");
                     alert.setHeaderText("Incorrect data!");
                     alert.setContentText("It's too late to cancel reservation.");
                     alert.showAndWait();
@@ -266,7 +266,7 @@ public class UserController {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Reservation canceled");
                 alert.setHeaderText(null);
-                alert.setContentText("You cancel reservation " + number);
+                alert.setContentText("You've just cancelled reservation " + number);
                 alert.showAndWait();
 
             }catch (SQLException sql){
@@ -346,6 +346,8 @@ public class UserController {
             extraServController.initMenuButton(names);//TODO=provide collection for initialization
             extraServController.amountOfPeople = peopleAmount;
             extraServController.setValueFactoryForMB();
+            extraServController.checkDateFrom = checkinDate;
+            extraServController.checkDateTo = checkoutDate;
             Scene extraServScene = new Scene(root);
             extraServStage.setScene(extraServScene);
             extraServStage.initOwner(this.root.getScene().getWindow());
@@ -614,8 +616,8 @@ public class UserController {
             confirmStage.setScene(resConfirmScene);
             resConfirmController.backB.setOnAction(e -> {
                 confirmStage.close();
+                changeConfirmationStatus(ConfirmationStatus.Back);
             });
-
             resConfirmController.confirmB.setOnAction(e -> {
                 try{
                     Statement statement = Model.connection.createStatement();
@@ -663,8 +665,6 @@ public class UserController {
                 }catch (Exception e2){
                     System.out.println(e2.getMessage());
                 }
-                confirmStage.close();
-                changeConfirmationStatus(ConfirmationStatus.Back);
                 confirmStage.close();
                 bringToInitialState();
                 setAllVisible(false);
