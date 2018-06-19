@@ -20,3 +20,18 @@ begin
 end;
 $$
 language 'plpgsql';
+
+--dodaje karę w wysokośći 10% całkowitej ceny rezerwacji pokoju, jeśli anulowanie odbywa się "dzień przed"
+create or replace function dodaj_kare()
+    returns trigger as $dodaj_kare$
+begin
+    if old.data_od - current_date <= 1 then
+        insert into kary values (default, old.id_rez_zbiorczej, current_date, old.cena*0.10);
+    end if;
+    return new;
+end;
+$dodaj_kare$
+language 'plpgsql';
+
+create trigger dodaj_kare after update on rezerwacje_pokoje
+for each row execute procedure dodaj_kare();
