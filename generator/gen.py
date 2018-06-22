@@ -274,6 +274,7 @@ class maker:
 			cur.execute('SELECT MIN(cena_podstawowa) FROM pokoje WHERE id_pokoju = %s;',(room_id,));
 			rows=cur.fetchall()
 			price=rows[0][0]
+			print('price podstawowa' + str(price))
 			price=price*(decimal.Decimal(timeDiff))
 			print('date_from ' + date_from + '  date_to ' + date_to + ' price:  ' + str(price))
 			cur.execute('SELECT oblicz_znizke(%s, %s, %s);', (guest, price, date_from))
