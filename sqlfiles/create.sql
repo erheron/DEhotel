@@ -3,19 +3,18 @@ create table pokoje(
 	id_pokoju serial not null primary key,
 	typ varchar(20) not null,
 	cena_podstawowa numeric not null,
-	max_liczba_osob numeric(2) not null
-);
-create table email_hash(
-	email varchar(100) PRIMARY KEY,
-	hash numeric(10)
+	max_liczba_osob numeric(2) not null,
+	check (cena_podstawowa>0),
+	check (max_liczba_osob>0)
 );
 create table goscie(
 	id_goscia serial not null primary key,
 	imie varchar not null,
 	nazwisko varchar not null,
-	nr_tel char(9) not null,
-	email varchar(100) references email_hash,
-	check (email like '%@%')
+	nr_tel char(9) not null unique,
+	email varchar(100) not null unique,
+	check (email like '%@%'),
+	hash numeric(10)
 );
 
 create table rezerwacje_goscie(
@@ -30,21 +29,25 @@ create table rezerwacje_pokoje(
 	data_od date not null default current_date check (data_od>=current_date),
 	data_do date not null default current_date + interval '1 day' check (data_od<data_do),
 	cena numeric not null,
-	typ_platnosci char(1) check (typ_platnosci='G' or typ_platnosci='P') not null, -- G-gotwka, P-przelew
+	check (cena > 0),
 	plan_liczba_osob numeric,
-	anulowane_data date default null
+	check (plan_liczba_osob >0),
+	anulowane_data date default null,
+	check (anulowane_data >= current_date)
 );
 
 create table rodzaje_wyposazenia(
-  id_rodzaju_wyposazenia serial primary key,
+ 	id_rodzaju_wyposazenia serial primary key,
 	nazwa varchar not null,
 	cena_przedmiotu numeric not null,
+	check (cena_przedmiotu > 0),
 	liczba_przedmiotow numeric not null
+	check (liczba_przedmiotow >= 0)
 );
 
 create table wyposazenie(
 	id serial not null primary key,
-  id_rodzaju integer references rodzaje_wyposazenia
+  	id_rodzaju integer references rodzaje_wyposazenia
 	--nazwa varchar not null references rodzaje_wyposazenia
 );
 
@@ -64,13 +67,15 @@ create table kary(
 	id_kary serial not null primary key,
 	id_rez_zbiorczej integer references rezerwacje_goscie,
 	data_kary  date not null default current_date check (data_kary<=current_date),
-	kwota numeric not null
+	kwota numeric not null,
+	check (kwota>0)
 );
 
 create table uslugi_dod(
 	id_uslugi_dod serial not null primary key,
 	nazwa varchar(30) not null,
-	cena numeric not null
+	cena numeric not null,
+	check (cena>0)
 );
 
 create table usl_rez(
@@ -82,4 +87,3 @@ create table usl_rez(
 	data_anulowania date default null
 );
 COMMIT;
-
