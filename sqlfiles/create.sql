@@ -16,12 +16,10 @@ create table goscie(
 	check (email like '%@%'),
 	hash numeric(10)
 );
-
 create table rezerwacje_goscie(
 	id_rez_zbiorczej serial not null primary key,
 	id_goscia integer not null references goscie
 );
-
 create table rezerwacje_pokoje(
 	id_rez_zbiorczej integer references rezerwacje_goscie,
 	id_rez_pojedynczej serial not null primary key,
@@ -35,7 +33,6 @@ create table rezerwacje_pokoje(
 	anulowane_data date default null,
 	check (anulowane_data >= current_date)
 );
-
 create table rodzaje_wyposazenia(
  	id_rodzaju_wyposazenia serial primary key,
 	nazwa varchar not null,
@@ -44,25 +41,21 @@ create table rodzaje_wyposazenia(
 	liczba_przedmiotow numeric not null
 	check (liczba_przedmiotow >= 0)
 );
-
 create table wyposazenie(
 	id serial not null primary key,
   	id_rodzaju integer references rodzaje_wyposazenia
 	--nazwa varchar not null references rodzaje_wyposazenia
 );
-
 create table pokoje_wyposazenie(
 	id_pokoju integer not null references pokoje,
 	id_wyposazenia integer not null references wyposazenie
 );
-
 create table platnosci(
 	id_platnosci serial not null primary key,
 	id_rez_zbiorczej integer references rezerwacje_goscie,
 	data_platnosci date not null default current_date check (data_platnosci<=current_date),
 	kwota numeric not null
 );
-
 create table kary(
 	id_kary serial not null primary key,
 	id_rez_zbiorczej integer references rezerwacje_goscie,
@@ -70,7 +63,6 @@ create table kary(
 	kwota numeric not null,
 	check (kwota>0)
 );
-
 create table uslugi_dod(
 	id_uslugi_dod serial not null primary key,
 	nazwa varchar(30) not null,

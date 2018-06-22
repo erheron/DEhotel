@@ -14,14 +14,14 @@ drop function if exists dodaj_kare();
 
 drop function if exists oblicz_znizke(integer, numeric, date);
 
-drop table if exists usl_rez;
-drop table if exists uslugi_dod;
-drop table if exists kary;
-drop table if exists platnosci;
-drop table if exists pokoje_wyposazenie;
-drop table if exists wyposazenie;
-drop table if exists rodzaje_wyposazenia;
-drop table if exists rezerwacje_pokoje cascade;
-drop table if exists rezerwacje_goscie;
-drop table if exists goscie;
 drop table if exists pokoje;
+drop table if exists goscie;
+drop table if exists rezerwacje_goscie;
+drop table if exists rezerwacje_pokoje cascade;
+drop table if exists rodzaje_wyposazenia;
+drop table if exists wyposazenie;
+drop table if exists pokoje_wyposazenie;
+drop table if exists platnosci;
+drop table if exists kary;
+drop table if exists uslugi_dod;
+drop table if exists usl_rez;
