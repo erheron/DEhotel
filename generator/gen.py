@@ -262,6 +262,7 @@ class maker:
 			res_id = res_id + 1
 			guest=random.randint(1, 200)
 			cur.execute('INSERT INTO rezerwacje_goscie(id_goscia) VALUES (%s);', (guest,))
+			conn.commit()
 			date_from=f_us.date_between(start_date="today", end_date="+30d")
 			date_to=date_from + timedelta(random.randint(1,10))
 			timeDiff=(date_to - date_from)/timedelta(days=1)
@@ -281,7 +282,7 @@ class maker:
 			rows=cur.fetchall()
 			price=rows[0][0]
 			print("price after   " + str(price))
-			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, cena,  plan_liczba_osob) VALUES (%s, %s, %s, %s, %s, %s);',
+			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, cena, plan_liczba_osob) VALUES (%s, %s, %s, %s, %s, %s);',
 			(res_id, room_id, date_from, date_to, price, people))
 			conn.commit()
 
