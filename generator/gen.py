@@ -19,8 +19,6 @@ def random_with_N_digits(n):
     range_end = (10**n)-1
     return randint(range_start, range_end)
 
-#TODO: problem with standard input and connecting
-#dbname = input("Enter current database name: ")
 dbname="hotel"
 user = input("Enter user: ")
 password = input("Enter user password to connect: ")
@@ -56,21 +54,17 @@ class maker:
 			P = P % mod
 		return h
 			
-	def insert_names(self, table_name, col, k, faker, ommit_email):
+	def insert_names(self, table_name, col, k, faker):
 		for i in range(k):
 			random_name, random_surname = faker.first_name(), faker.last_name();
 			
 			#generating pseudo-random email
 			email= faker.email()
-			hash = self.hash_email(email)
-			if(hash == -1): continue
-			cur.execute('INSERT INTO email_hash VALUES (%s, %s)', (email, hash,))
+			hash_ = self.hash_email(email)
+			if(hash_ == -1): continue
 			tel_number='0' + str(random_with_N_digits(8))
-			if(ommit_email == False):
-				cur.execute(self.sql_insert.format(table_name, columns = col, val="'" + random_name + "', '" + random_surname + "', '" + tel_number + "', '"
-				+ email + "'"))
-			else:
-				cur.execute(self.sql_insert.format(table_name, columns = col, val="'" + random_name + "', '" + random_surname + "', '" + tel_number + "'"))	
+			cur.execute(self.sql_insert.format(table_name, columns = col, val="'" + random_name + "', '" + random_surname + "', '" + tel_number + "', '"
+			+ email + "'"))
 
 		conn.commit()
 
@@ -288,8 +282,8 @@ mainMaker = maker()
 
 
 print("Filling guests...........")
-mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_pl, False) 
-mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_us, False) 
+mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_pl) 
+mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_us) 
 print(">Done")
 
 print("Filling rooms............")

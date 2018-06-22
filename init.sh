@@ -38,8 +38,6 @@ else
 fi
 
 #main part
-psql -d hotel < sqlfiles/clear.sql
-psql -d hotel < sqlfiles/create.sql
-psql -d hotel < sqlfiles/functions.sql
-psql -d hotel < sqlfiles/insertServices.sql
+psql -d hotel < sqlfiles/clear.sql 2&> /dev/null
+psql -d hotel < sqlfiles/create.sql 2&> /dev/null
 python3 generator/gen.py
