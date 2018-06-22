@@ -1,5 +1,5 @@
-drop trigger if exists function anuluj_usluge on usl_rez;
-drop function if exists function anuluj_usluge();
+drop trigger if exists anuluj_usluge on usl_rez;
+drop function if exists anuluj_usluge();
 
 drop trigger if exists dodaj_cene_za_usluge on usl_rez;
 drop function if exists dodaj_cene_za_usluge();

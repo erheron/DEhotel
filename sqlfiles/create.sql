@@ -84,6 +84,7 @@ create table usl_rez(
 	liczba numeric not null default 1,
 	data_od date not null,
 	data_do date not null,
+	check (data_od<data_do),
 	data_anulowania date default null
 );
 COMMIT;
