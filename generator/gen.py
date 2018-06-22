@@ -19,8 +19,6 @@ def random_with_N_digits(n):
     range_end = (10**n)-1
     return randint(range_start, range_end)
 
-#TODO: problem with standard input and connecting
-#dbname = input("Enter current database name: ")
 dbname="hotel"
 user = input("Enter user: ")
 password = input("Enter user password to connect: ")
@@ -56,21 +54,17 @@ class maker:
 			P = P % mod
 		return h
 			
-	def insert_names(self, table_name, col, k, faker, ommit_email):
+	def insert_names(self, table_name, col, k, faker):
 		for i in range(k):
 			random_name, random_surname = faker.first_name(), faker.last_name();
 			
 			#generating pseudo-random email
 			email= faker.email()
-			hash = self.hash_email(email)
-			if(hash == -1): continue
-			cur.execute('INSERT INTO email_hash VALUES (%s, %s)', (email, hash,))
+			hash_ = self.hash_email(email)
+			if(hash_ == -1): continue
 			tel_number='0' + str(random_with_N_digits(8))
-			if(ommit_email == False):
-				cur.execute(self.sql_insert.format(table_name, columns = col, val="'" + random_name + "', '" + random_surname + "', '" + tel_number + "', '"
-				+ email + "'"))
-			else:
-				cur.execute(self.sql_insert.format(table_name, columns = col, val="'" + random_name + "', '" + random_surname + "', '" + tel_number + "'"))	
+			cur.execute(self.sql_insert.format(table_name, columns = col, val="'" + random_name + "', '" + random_surname + "', '" + tel_number + "', '"
+			+ email + "'"))
 
 		conn.commit()
 
@@ -270,16 +264,16 @@ class maker:
 			date_to=date_from + timedelta(random.randint(1,10))
 			date_from=date_from.isoformat()
 			date_to=date_to.isoformat()
-			cur.execute('SELECT MIN(id_pokoju) FROM pokoje p1 WHERE NOT EXISTS (SELECT * FROM rezerwacje_pokoje rp WHERE rp.id_pokoju = p1.id_pokoju AND NOT(rp.data_od >= %s::date OR rp.data_do <= %s::date));',(date_to, date_from)) 
+			people=random.randint(1,3)
+			cur.execute('SELECT MIN(id_pokoju) FROM pokoje p1 WHERE max_liczba_osob = %s AND NOT EXISTS (SELECT * FROM rezerwacje_pokoje rp WHERE rp.id_pokoju = p1.id_pokoju AND NOT(rp.data_od >= %s::date OR rp.data_do <= %s::date));',(people, date_to, date_from)) 
 			rows=cur.fetchall()
 			room_id=rows[0][0]
-			people=random.randint(1,3)
 			cur.execute('SELECT MIN(cena_podstawowa) FROM pokoje WHERE id_pokoju = %s;',(room_id,));
 			rows=cur.fetchall()
 			price=rows[0][0]
 #			print('date_from ' + date_from + '  date_to ' + date_to)
-			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, cena, typ_platnosci, plan_liczba_osob) VALUES (%s, %s, %s, %s, %s, %s, %s);',
-			(res_id, room_id, date_from, date_to, price,'G', people))
+			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, cena,  plan_liczba_osob) VALUES (%s, %s, %s, %s, %s, %s);',
+			(res_id, room_id, date_from, date_to, price, people))
 		conn.commit()
 
 
@@ -288,8 +282,8 @@ mainMaker = maker()
 
 
 print("Filling guests...........")
-mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_pl, False) 
-mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_us, False) 
+mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_pl) 
+mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_us) 
 print(">Done")
 
 print("Filling rooms............")
