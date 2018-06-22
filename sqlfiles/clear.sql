@@ -21,7 +21,6 @@ drop table if exists rezerwacje_pokoje cascade;
 drop table if exists rodzaje_wyposazenia cascade;
 drop table if exists wyposazenie cascade;
 drop table if exists pokoje_wyposazenie cascade;
-drop table if exists platnosci cascade;
 drop table if exists kary cascade;
 drop table if exists uslugi_dod cascade;
 drop table if exists usl_rez cascade;
