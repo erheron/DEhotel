@@ -1,0 +1,7 @@
+@erheron, 08.06.2018, 22:52
+column "email" in klienci now can be null, deleted constraint on "unique"
+added column "typ" to pokoje
+deleted redundant 'pierwsza wizyta' from goscie
+deleted constraint on unique telefone number(sometimes it just isn't true, providers sell old numbers)
+'nazwa' is no longer primary key in 'rodzaje_wyposazenia', because of memory
+added half-done init.sh - it will do all work for user(TODO)
