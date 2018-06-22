@@ -8,6 +8,7 @@ import datetime
 import time
 import calendar
 import random
+import decimal
 from pprint import pprint
 from faker import Faker
 from random import randint
@@ -61,10 +62,11 @@ class maker:
 			#generating pseudo-random email
 			email= faker.email()
 			hash_ = self.hash_email(email)
-			if(hash_ == -1): continue
+			if(hash_ == -1): 
+				continue
 			tel_number='0' + str(random_with_N_digits(8))
 			cur.execute(self.sql_insert.format(table_name, columns = col, val="'" + random_name + "', '" + random_surname + "', '" + tel_number + "', '"
-			+ email + "'"))
+			+ email + "', " + str(hash_)))
 
 		conn.commit()
 
@@ -262,6 +264,7 @@ class maker:
 			cur.execute('INSERT INTO rezerwacje_goscie(id_goscia) VALUES (%s);', (guest,))
 			date_from=f_us.date_between(start_date="today", end_date="+30d")
 			date_to=date_from + timedelta(random.randint(1,10))
+			timeDiff=(date_to - date_from)/timedelta(days=1)
 			date_from=date_from.isoformat()
 			date_to=date_to.isoformat()
 			people=random.randint(1,3)
@@ -271,10 +274,15 @@ class maker:
 			cur.execute('SELECT MIN(cena_podstawowa) FROM pokoje WHERE id_pokoju = %s;',(room_id,));
 			rows=cur.fetchall()
 			price=rows[0][0]
-#			print('date_from ' + date_from + '  date_to ' + date_to)
+			price=price*(decimal.Decimal(timeDiff))
+			print('date_from ' + date_from + '  date_to ' + date_to + ' price:  ' + str(price))
+			cur.execute('SELECT oblicz_znizke(%s, %s, %s);', (guest, price, date_from))
+			rows=cur.fetchall()
+			price=rows[0][0]
+			print("price after   " + str(price))
 			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, cena,  plan_liczba_osob) VALUES (%s, %s, %s, %s, %s, %s);',
 			(res_id, room_id, date_from, date_to, price, people))
-		conn.commit()
+			conn.commit()
 
 
 #filling tables
@@ -282,8 +290,8 @@ mainMaker = maker()
 
 
 print("Filling guests...........")
-mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_pl) 
-mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email',100, f_us) 
+mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email, hash',100, f_pl) 
+mainMaker.insert_names('goscie', 'imie, nazwisko, nr_tel, email, hash',100, f_us) 
 print(">Done")
 
 print("Filling rooms............")

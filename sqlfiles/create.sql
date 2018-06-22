@@ -5,7 +5,7 @@ create table pokoje(
 	typ varchar(20) not null,
 	cena_podstawowa numeric not null,
 	max_liczba_osob numeric(2) not null,
-	check (cena_podstawowa>0),
+	check (cena_podstawowa > 0),
 	check ( typ = 'single standard' OR typ = 'single superior' OR typ = 'single deluxe' OR
 			typ = 'double standard' OR typ = 'double superior' OR typ = 'double deluxe' OR
 			typ = 'twin standard' OR typ = 'twin superior' OR typ = 'twin deluxe' OR
@@ -57,12 +57,6 @@ create table wyposazenie(
 create table pokoje_wyposazenie(
 	id_pokoju integer not null references pokoje,
 	id_wyposazenia integer not null references wyposazenie
-);
-create table platnosci(
-	id_platnosci serial not null primary key,
-	id_rez_zbiorczej integer references rezerwacje_goscie,
-	data_platnosci date not null default current_date check (data_platnosci<=current_date),
-	kwota numeric not null
 );
 create table kary(
 	id_kary serial not null primary key,
@@ -164,7 +158,7 @@ declare
     cena_pokoju numeric;
 begin
     cena_pokoju = (select cena_podstawowa from pokoje where id_pokoju = new.id_pokoju) * (new.data_do - new.data_od);
-    gosc = (select id_goscia from rezerwacje_pokoje natural join rezerwacje_goscie);
+    gosc = (select distinct id_goscia from rezerwacje_pokoje natural join rezerwacje_goscie where id_rez_zbiorczej = new.id_rez_zbiorczej);
     wynik = (select id_pokoju from pokoje where id_pokoju = new.id_pokoju and id_pokoju in
     (select id_pokoju
 	from rezerwacje_pokoje
@@ -178,7 +172,7 @@ begin
     elsif new.plan_liczba_osob > (select max_liczba_osob from pokoje where id_pokoju = new.id_pokoju) then
         raise exception 'za duzo gosci do pokoju';
     elsif new.cena <> (select oblicz_znizke(gosc, cena_pokoju, new.data_od)) then
-	raise exception 'podano nieprawidlowa cene, prawidlowa cena to % ', (select oblicz_znizke(gosc, cena_pokoju, new.data_od));
+	raise exception 'podano nieprawidlowa cene: %, prawidlowa cena to % ', new.cena, (select oblicz_znizke(gosc, cena_pokoju, new.data_od));
     end if;
     return new;
 end;
