@@ -235,7 +235,7 @@ public class UserController {
                 for( ; i < number.length(); i++){
                     id.append(number.charAt(i));
                 }
-                String checkCancel = "select id_goscia, data_od from rezerwacje_goscie natural join rezerwacje_pokoje where id_rez_pojedynczej = " + Integer.parseInt(id.toString()) +" and id_rez_zbiorczej= " + Integer.parseInt(mainID.toString()) + ";";
+                String checkCancel = "select id_goscia, data_od, anulowane_data from rezerwacje_goscie natural join rezerwacje_pokoje where id_rez_pojedynczej = " + Integer.parseInt(id.toString()) +" and id_rez_zbiorczej= " + Integer.parseInt(mainID.toString()) + ";";
                 Statement statement0 = Model.connection.createStatement();
                 //System.out.println(checkCancel);
                 ResultSet rs = statement0.executeQuery(checkCancel);
@@ -243,7 +243,7 @@ public class UserController {
                     throw new Exception();
                 }
                 rs.next();
-                if(rs.getInt("id_goscia")!=idGast) {
+                if(rs.getInt("id_goscia")!=idGast || (rs.getString("anulowane_data")!=null)) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error occured");
                     alert.setHeaderText("Incorrect data!");
@@ -251,7 +251,7 @@ public class UserController {
                     alert.showAndWait();
                     return;
                 }
-                if(LocalDate.parse(rs.getString("data_od")).isAfter(LocalDate.now())) {
+                if(LocalDate.parse(rs.getString("data_od")).isBefore(LocalDate.now())) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error occured");
                     alert.setHeaderText("Incorrect data!");
