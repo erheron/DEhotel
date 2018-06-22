@@ -96,6 +96,7 @@ begin
 	suma_dni = coalesce((select sum(data_do - data_od)
 			from  rezerwacje_pokoje natural join rezerwacje_goscie
 			where id = id_goscia and data_od >= (od_data - interval '365 days')),0);
+	raise notice 'liczba dni %', suma_dni;
 	if suma_dni < 7 then
 		return round(cena,2);
 	elsif suma_dni >=7 and suma_dni < 30 then
@@ -114,7 +115,7 @@ begin
     if(new.id_rez_zbiorczej <> old.id_rez_zbiorczej or new.id_rez_pojedynczej <> old.id_rez_pojedynczej or new.id_pokoju <> old.id_pokoju or new.data_od<>old.data_od or new.data_do <> old.data_do or new.plan_liczba_osob <> old.plan_liczba_osob) then
 	raise exception 'nie mozna edytowac rezerwacji';
     --TODO = update ceny tylko z triggera, da sie to sprawdzic?
-    elsif old.anulowane_data is not null then
+    elsif new.anulowane_data is not null and old.anulowane_data is not null then
 		raise exception 'rezerwacja zostala juz anulowana';
     elsif new.anulowane_data is not null and new.anulowane_data > old.data_od then
 		raise exception 'za pozno na rezygnacje z rezerwacji';
@@ -158,7 +159,7 @@ declare
     cena_pokoju numeric;
 begin
     cena_pokoju = (select cena_podstawowa from pokoje where id_pokoju = new.id_pokoju) * (new.data_do - new.data_od);
-    gosc = (select distinct id_goscia from rezerwacje_pokoje natural join rezerwacje_goscie where id_rez_zbiorczej = new.id_rez_zbiorczej);
+    gosc = (select distinct id_goscia from rezerwacje_goscie where id_rez_zbiorczej = new.id_rez_zbiorczej);
     wynik = (select id_pokoju from pokoje where id_pokoju = new.id_pokoju and id_pokoju in
     (select id_pokoju
 	from rezerwacje_pokoje
@@ -172,7 +173,7 @@ begin
     elsif new.plan_liczba_osob > (select max_liczba_osob from pokoje where id_pokoju = new.id_pokoju) then
         raise exception 'za duzo gosci do pokoju';
     elsif new.cena <> (select oblicz_znizke(gosc, cena_pokoju, new.data_od)) then
-	raise exception 'podano nieprawidlowa cene: %, prawidlowa cena to % ', new.cena, (select oblicz_znizke(gosc, cena_pokoju, new.data_od));
+	raise exception 'gosc: % podano nieprawidlowa cene: %, prawidlowa cena to % ', gosc, new.cena, (select oblicz_znizke(gosc, cena_pokoju, new.data_od));
     end if;
     return new;
 end;
@@ -201,7 +202,7 @@ begin
 
     if (new.data_od < od_data or new.data_do > do_data) then
 	raise exception 'data uslugi nie jest zgodna z data rezerwacji';
-    elsif (select sum(liczba)
+    elsif (select coalesce(sum(liczba),0)
 	from usl_rez u join rezerwacje_pokoje rp on u.id_rez_pojedynczej = rp.id_rez_pojedynczej
 	where u.id_rez_pojedynczej = new.id_rez_pojedynczej and id_uslugi_dod = new.id_uslugi_dod and data_anulowania is null
 	and ((new.data_od < u.data_od and u.data_od < new.data_do) or
