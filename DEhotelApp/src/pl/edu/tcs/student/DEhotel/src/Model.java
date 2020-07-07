@@ -26,9 +26,10 @@ public class Model extends Application {
         primaryStage.setTitle("DEhotel - from Krakow with love :)");
         //login form goes first
         Stage loginStage = new Stage();
-        loginStage.setTitle("log in");
+        loginStage.setTitle("Log in");
         loginStage.setResizable(false);
-        FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("login.fxml"));
+        FXMLLoader loginLoader = new FXMLLoader();
+        loginLoader.setLocation(getClass().getClassLoader().getResource("login.fxml"));
         AnchorPane loginRoot = loginLoader.load();
         loginController = loginLoader.getController();
         loginController.loginB.setOnAction(e -> {
@@ -73,22 +74,23 @@ public class Model extends Application {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("I can't find your PostgreSQL JDBC Driver!");
-            e.printStackTrace();
+            System.err.println("PostgreSQL JDBC Driver not found, exiting...");
             return;
         }
 
         try {
-            //File file = new File("dataConnection");
+            File file = new File("db-connection.config");
 
-            //BufferedReader br = new BufferedReader(new FileReader(file));
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE THAT VALUES TO YOUR ACTUAL DATA!!!!!!!!!!!!!!!!!!!!!
-            connection = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/hotel", "erheron", "erheron");
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String url, user,password;
+            url = br.readLine();
+            user = br.readLine();
+            password = br.readLine();
+
+            connection = DriverManager.getConnection(url, user, password);
         } catch (Exception e) {
-            System.out.println("Connection Failed!");
             e.printStackTrace();
-
+            System.err.println("Connection Failed!");
         }
     }
 }

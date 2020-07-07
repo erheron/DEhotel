@@ -9,9 +9,9 @@
 <AnchorPane fx:id="root" focusTraversable="true" prefHeight="288.0" prefWidth="446.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LoginController">
    <children>
       <Button fx:id="loginB" focusTraversable="false" layoutX="137.0" layoutY="169.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="171.0" text="Log in" />
-      <Label focusTraversable="false" layoutX="139.0" layoutY="31.0" prefHeight="16.0" prefWidth="171.0" text="Hello! Log in to use app" textAlignment="CENTER" />
+      <Label  layoutX="139.0" layoutY="31.0" prefHeight="16.0" prefWidth="171.0" text="Hello! Log in to use app" textAlignment="CENTER" />
       <PasswordField fx:id="passwordF" focusTraversable="false" layoutX="87.0" layoutY="129.0" onKeyPressed="#passwordFkPressed" prefHeight="26.0" prefWidth="296.0" promptText="Enter password" AnchorPane.leftAnchor="63.0" AnchorPane.rightAnchor="63.0" />
-      <TextField fx:id="loginF" focusTraversable="false" layoutX="87.0" layoutY="80.0" onKeyPressed="#loginFkPressed" prefHeight="26.0" prefWidth="296.0" promptText="Enter login" AnchorPane.leftAnchor="63.0" AnchorPane.rightAnchor="63.0" />
+      <TextField fx:id="loginF" focusTraversable="false" layoutX="87.0" layoutY="80.0" onKeyPressed="#loginFkPressed" prefHeight="26.0" prefWidth="296.0" promptText="Enter login(email)" AnchorPane.leftAnchor="63.0" AnchorPane.rightAnchor="63.0" />
       <Button fx:id="registrationB" focusTraversable="false" layoutX="138.0" layoutY="238.0" mnemonicParsing="false" onAction="#registrationBaction" prefHeight="26.0" prefWidth="171.0" text="Registration" />
       <Label alignment="CENTER" contentDisplay="CENTER" layoutX="63.0" layoutY="205.0" prefHeight="26.0" prefWidth="320.0" text="or proceed to" textAlignment="CENTER" AnchorPane.leftAnchor="63.0" AnchorPane.rightAnchor="63.0" />
    </children>

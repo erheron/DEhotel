@@ -1,5 +1,5 @@
-#changed Python to python3(default 3.5.2 on my laptop)
-# -*- coding: utf-8 -*-
+#changed Python to python3(default 3.5.2)
+#encoding=utf-8
 
 #from __future__ import unicode_literals
 #import json
@@ -21,8 +21,8 @@ def random_with_N_digits(n):
     return randint(range_start, range_end)
 
 dbname="hotel"
-user = input("Enter user: ")
-password = input("Enter user password to connect: ")
+user = raw_input("Enter user: ")
+password = raw_input("Enter user password to connect: ")
 
 try:
 	conn = psycopg2.connect(dbname=dbname, user=user, password=password)
@@ -65,8 +65,9 @@ class maker:
 			if(hash_ == -1): 
 				continue
 			tel_number='0' + str(random_with_N_digits(8))
-			cur.execute(self.sql_insert.format(table_name, columns = col, val="'" + random_name + "', '" + random_surname + "', '" + tel_number + "', '"
-			+ email + "', " + str(hash_)))
+                        value=u''.join(("'", random_name, "', '",random_surname, "', '",tel_number, "', '",
+			      email,"', '", str(hash_), "'")).encode('utf-8')
+			cur.execute(self.sql_insert.format(table_name, columns = col, val=value))
 
 		conn.commit()
 
@@ -253,19 +254,20 @@ class maker:
 		self.fill_superior_rooms()
 		self.fill_deluxe_rooms()
 		self.fill_bed_all_rooms()
+
 	def add_some_random_reservations(self):
-		random.seed(a=None, version=2)
+		random.seed(a=None)
 		cur.execute('SELECT COALESCE(MAX(id_rez_zbiorczej),0) FROM rezerwacje_goscie;')
 		rows = cur.fetchall()
 		res_id = rows[0][0]
 		for i in range(100):
 			res_id = res_id + 1
-			guest=random.randint(1, 200)
+			guest=random.randint(1, 100)
 			cur.execute('INSERT INTO rezerwacje_goscie(id_goscia) VALUES (%s);', (guest,))
 			conn.commit()
 			date_from=f_us.date_between(start_date="today", end_date="+30d")
 			date_to=date_from + timedelta(random.randint(1,10))
-			timeDiff=(date_to - date_from)/timedelta(days=1)
+			timeDiff=(date_to - date_from).days
 			date_from=date_from.isoformat()
 			date_to=date_to.isoformat()
 			people=random.randint(1,3)
@@ -275,13 +277,13 @@ class maker:
 			cur.execute('SELECT MIN(cena_podstawowa) FROM pokoje WHERE id_pokoju = %s;',(room_id,));
 			rows=cur.fetchall()
 			price=rows[0][0]
-			print('price podstawowa' + str(price))
+			#print('price podstawowa' + str(price))
 			price=price*(decimal.Decimal(timeDiff))
-			print('date_from ' + date_from + '  date_to ' + date_to + ' price:  ' + str(price))
+			#print('date_from ' + date_from + '  date_to ' + date_to + ' price:  ' + str(price))
 			cur.execute('SELECT oblicz_znizke(%s, %s, %s);', (guest, price, date_from))
 			rows=cur.fetchall()
 			price=rows[0][0]
-			print("price after   " + str(price))
+			#print("price after   " + str(price))
 			cur.execute('INSERT INTO rezerwacje_pokoje(id_rez_zbiorczej, id_pokoju, data_od, data_do, cena, plan_liczba_osob) VALUES (%s, %s, %s, %s, %s, %s);',
 			(res_id, room_id, date_from, date_to, price, people))
 			conn.commit()
@@ -311,4 +313,4 @@ print(">Done")
 print("And some 'random' reservations.....")
 mainMaker.add_some_random_reservations()
 print(">Done")
-print("Have fun :)")
+print("Finished.")

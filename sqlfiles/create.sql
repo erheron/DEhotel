@@ -1,5 +1,6 @@
 BEGIN;
 --TABELE
+drop table if exists pokoje;
 create table pokoje(
 	id_pokoju serial not null primary key,
 	typ varchar(20) not null,
@@ -15,6 +16,7 @@ create table pokoje(
 			(typ LIKE 'twin%'   AND max_liczba_osob = 2) OR	
 			(typ LIKE 'triple%' AND max_liczba_osob = 3))
 );
+drop table if exists goscie;
 create table goscie(
 	id_goscia serial not null primary key,
 	imie varchar not null,
@@ -24,10 +26,12 @@ create table goscie(
 	check (email like '%@%'),
 	hash numeric(10)
 );
+drop table if exists rezerwacje_goscie;
 create table rezerwacje_goscie(
 	id_rez_zbiorczej serial not null primary key,
 	id_goscia integer not null references goscie
 );
+drop table if exists rezerwacje_pokoje;
 create table rezerwacje_pokoje(
 	id_rez_zbiorczej integer references rezerwacje_goscie,
 	id_rez_pojedynczej serial not null primary key,
@@ -41,6 +45,7 @@ create table rezerwacje_pokoje(
 	anulowane_data date default null,
 	check (anulowane_data >= current_date)
 );
+drop table if exists rodzaje_wyposazenia;
 create table rodzaje_wyposazenia(
  	id_rodzaju_wyposazenia serial primary key,
 	nazwa varchar not null,
@@ -49,15 +54,18 @@ create table rodzaje_wyposazenia(
 	liczba_przedmiotow numeric not null
 	check (liczba_przedmiotow >= 0)
 );
+drop table if exists wyposazenie;
 create table wyposazenie(
 	id serial not null primary key,
   	id_rodzaju integer references rodzaje_wyposazenia
 	--nazwa varchar not null references rodzaje_wyposazenia
 );
+drop table if exists pokoje_wyposazenie;
 create table pokoje_wyposazenie(
 	id_pokoju integer not null references pokoje,
 	id_wyposazenia integer not null references wyposazenie
 );
+drop table if exists kary;
 create table kary(
 	id_kary serial not null primary key,
 	id_rez_zbiorczej integer references rezerwacje_goscie,
@@ -65,12 +73,14 @@ create table kary(
 	kwota numeric not null,
 	check (kwota>0)
 );
+drop table if exists uslugi_dod;
 create table uslugi_dod(
 	id_uslugi_dod serial not null primary key,
 	nazwa varchar(30) not null,
 	cena numeric not null,
 	check (cena>0)
 );
+drop table if exists usl_rez;
 create table usl_rez(
 	id_uslugi_dod integer not null references uslugi_dod,
 	id_rez_pojedynczej integer references rezerwacje_pokoje,
