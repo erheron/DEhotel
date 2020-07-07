@@ -73,22 +73,25 @@ public class Model extends Application {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("I can't find your PostgreSQL JDBC Driver!");
-            e.printStackTrace();
+            System.err.println("PostgreSQL JDBC Driver not found, exiting...");
             return;
         }
 
         try {
-            //File file = new File("dataConnection");
+            File file = new File("db-connection.config");
 
-            //BufferedReader br = new BufferedReader(new FileReader(file));
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String url, user,password;
+            url = br.readLine();
+            user = br.readLine();
+            password = br.readLine();
+
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE THAT VALUES TO YOUR ACTUAL DATA!!!!!!!!!!!!!!!!!!!!!
-            connection = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/hotel", "erheron", "erheron");
+            //connection = DriverManager.getConnection(
+            //        "jdbc:postgresql://localhost:5432/hotel", "erheron", "erheron");
+            connection = DriverManager.getConnection(url, user, password);
         } catch (Exception e) {
-            System.out.println("Connection Failed!");
-            e.printStackTrace();
-
+            System.err.println("Connection Failed!");
         }
     }
 }
