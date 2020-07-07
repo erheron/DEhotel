@@ -39,3 +39,4 @@ fi
 psql -d hotel < sqlfiles/clear.sql 2> /dev/null
 psql -d hotel < sqlfiles/create.sql 2> /dev/null
 python3 generator/gen.py
+cp DEhotelApp/out/artifacts/DEhotelApp_jar/DEhotelApp.jar ./app.jar
