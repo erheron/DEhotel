@@ -40,3 +40,5 @@ psql -d hotel < sqlfiles/clear.sql 2> /dev/null
 psql -d hotel < sqlfiles/create.sql 2> /dev/null
 python3 generator/gen.py
 cp DEhotelApp/out/artifacts/DEhotelApp_jar/DEhotelApp.jar ./app.jar
+echo "Assuming default JavaFX folder is /usr/share/openjfx..."
+java --module-path /usr/share/openjfx/lib --add-modules=javafx.controls,javafx.fxml,javafx.base,javafx.media,javafx.web,javafx.swing -jar app.jar 2> /dev/null

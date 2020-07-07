@@ -1,28 +1,26 @@
 # DEhotel
-It's a semester project for Data Engineering course on TCS department, 2017/18 academic year. Includes 
-simple database dedicated to manage one hotel and javafx application, providing user/admin interface along with registration form and other functionalities
+It's a semester project for Data Engineering course on TCS department, 2017/18 academic year. It includes simple database, dedicated to manage one hotel, and javafx application, providing user/admin interface along with registration form and other functionalities
 
-#Prerequizites
-You should have the following programs on your computer to use our app:
+## Prerequizites
 
-Python 3.5+  
-Faker: https://github.com/joke2k/faker, one simple Python package  
-Java compiler version 9+ (build 53.0+)  
-psycopg2, another Python package  
+You should have the following programs on your computer to use this app:
 
-Our app will attempt to install python packages for you, in case you've run init.sh
+1. Python 3.5+  
+2. **Faker**: https://github.com/joke2k/faker, one simple Python package  
+3. Java compiler version 9+ (build 53.0+)  
+4. **psycopg2**, another Python package  
 
-#
-
-#Initialize database
-Simply run ```./init.sh``` in main folder
-
-#Run application
-Run
-```java -jar DEhotelApp.jar```  
-in folder ```out/artifacts/DEhotelApp_jar```  
+There is a dedicated script, which will check whether these requirements are satisfied, and install them if necessary, then launch the app (`init.sh`).
 
 
-#Authors
-* **Władysław Raczek**
+### Initialize database and run application
+(Linux assumed)
+
+Simply run ```./init.sh``` in main folder. Application should start normally.
+After that, in main folder there would be `app.jar` file, which You could run as jar file.
+
+
+
+#### Authors
+* **Vladyslav Rachek**
 * **Katarzyna Król**
