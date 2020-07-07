@@ -87,9 +87,6 @@ public class Model extends Application {
             user = br.readLine();
             password = br.readLine();
 
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE THAT VALUES TO YOUR ACTUAL DATA!!!!!!!!!!!!!!!!!!!!!
-            //connection = DriverManager.getConnection(
-            //       "jdbc:postgresql://localhost:5432/hotel", "erheron", "erheron");
             connection = DriverManager.getConnection(url, user, password);
         } catch (Exception e) {
             e.printStackTrace();
