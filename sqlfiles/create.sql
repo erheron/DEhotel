@@ -26,7 +26,6 @@ create table goscie(
 	check (email like '%@%'),
 	hash numeric(10)
 );
-drop table if exists 
 drop table if exists rezerwacje_goscie;
 create table rezerwacje_goscie(
 	id_rez_zbiorczej serial not null primary key,
