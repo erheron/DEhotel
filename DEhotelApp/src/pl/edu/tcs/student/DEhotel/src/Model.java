@@ -26,9 +26,10 @@ public class Model extends Application {
         primaryStage.setTitle("DEhotel - from Krakow with love :)");
         //login form goes first
         Stage loginStage = new Stage();
-        loginStage.setTitle("log in");
+        loginStage.setTitle("Log in");
         loginStage.setResizable(false);
-        FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("login.fxml"));
+        FXMLLoader loginLoader = new FXMLLoader();
+        loginLoader.setLocation(getClass().getClassLoader().getResource("login.fxml"));
         AnchorPane loginRoot = loginLoader.load();
         loginController = loginLoader.getController();
         loginController.loginB.setOnAction(e -> {
@@ -88,9 +89,10 @@ public class Model extends Application {
 
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE THAT VALUES TO YOUR ACTUAL DATA!!!!!!!!!!!!!!!!!!!!!
             //connection = DriverManager.getConnection(
-            //        "jdbc:postgresql://localhost:5432/hotel", "erheron", "erheron");
+            //       "jdbc:postgresql://localhost:5432/hotel", "erheron", "erheron");
             connection = DriverManager.getConnection(url, user, password);
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("Connection Failed!");
         }
     }

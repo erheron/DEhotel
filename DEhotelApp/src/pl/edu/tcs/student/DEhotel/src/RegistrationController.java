@@ -20,14 +20,13 @@ public class RegistrationController {
             Statement statement = Model.connection.createStatement();
            // Model.connection.setAutoCommit(false);
             takeAndInsertData();
-            String insertGast = "insert into goscie values (default, '" + nameTF.getText() + "', '" + surnameTF.getText() + "', '" +  phoneNumberTF.getText() + "', '" + emailTF.getText() +"');";
             Long hash = Hasher.hash(passwordF.getText());
-            String insertHash = "insert into email_hash values ('"+ emailTF.getText() + "', " + hash+ ");";
-            statement.executeUpdate(insertHash);
+            String insertGast = "insert into goscie values (default, '" + nameTF.getText() + "', '"
+                    + surnameTF.getText() + "', '" +  phoneNumberTF.getText() + "', '" + emailTF.getText() +"'," + hash+ ");";
             statement.executeUpdate(insertGast);
 
             //Files.write(Paths.get("userspasswords.txt"), new String("<email>:"+ emailTF.getText() +"     "+"<password>:"+passwordF.getText()+"\n").getBytes(), StandardOpenOption.APPEND);
-            //Model.connection.commit();
+            // Model.connection.commit();
             //Model.connection.setAutoCommit(true);
             ((Stage) submitButton.getParent().getScene().getWindow()).close();
 

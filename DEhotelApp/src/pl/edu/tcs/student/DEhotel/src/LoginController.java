@@ -28,6 +28,7 @@ public class LoginController {
     @FXML public PasswordField passwordF;
     @FXML public TextField loginF;
     @FXML public AnchorPane root;
+    @FXML public Button registrationB;
 
     private RegistrationController registrationController;
     //SimpleBooleanProperty loginBPressed = new SimpleBooleanProperty(false);
@@ -73,7 +74,7 @@ public class LoginController {
 
             //execute query
             stmt = Model.connection.createStatement();
-            String select = "select imie, nazwisko, id_goscia from email_hash natural join goscie where email = '" +login+ "' and hash = " + hash+ ";";
+            String select = "select imie, nazwisko, id_goscia from goscie where email = '" +login+ "' and hash = " + hash+ ";";
             ResultSet rs = stmt.executeQuery(select);
             if (!rs.isBeforeFirst() ) { //user or password don't exist
                 throw new Exception();
@@ -88,7 +89,7 @@ public class LoginController {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error Dialog");
                 alert.setHeaderText("Login error!");
-                alert.setContentText("User or password don't exist.");
+                alert.setContentText("User or password doesn't exist.");
                 alert.showAndWait();
 
         }
